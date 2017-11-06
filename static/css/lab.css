@@ -1,3 +1,7 @@
+#layout {
+    width: 100%;
+}
+
 .custom-restricted-width {
     /* To limit the menu width to the content of the menu: */
     display: inline-block;

@@ -8,7 +8,7 @@ class SampleInfoAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
-admin.register(SampleInfo, SampleInfoAdmin)
+admin.site.register(SampleInfo, SampleInfoAdmin)
 # admin.register(SubjectInfo)
 # admin.register(Project)
 # admin.register(FamilyInfo)

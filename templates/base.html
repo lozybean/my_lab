@@ -12,7 +12,7 @@
 
 <body>
 <div id="layout" class="pure-g">
-    <div class="sidebar pure-u-md-1-4">
+    <div class="sidebar pure-u-1-4">
         <div class="pure-menu custom-restricted-width">
             <span class="pure-menu-heading">My Lab实验室样品管理系统</span>
 
@@ -26,18 +26,12 @@
     </div>
 
 
-    <div class="content pure-u-md-3-4">
+    <div class="content pure-u-3-4">
         <div>
             {% block content %}
             {% endblock %}
             <div class="footer">
-                <div class="pure-menu pure-menu-horizontal pure-menu-open">
-                    <ul>
-                        <li><a href="https://coding.net/u/illion">Coding.Net</a></li>
-                        <li><a href="{% url 'about_me' %}">About Me</a></li>
-                        <li><a href="https://github.com/lozybean">GitHub</a></li>
-                    </ul>
-                </div>
+
             </div>
         </div>
     </div>
