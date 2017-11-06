@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div>
+        <table>
+            <tr>
+                样本名称：{{ sample.name }}
+            </tr>
+            <tr>
+                样本条码号：{{ sample.barcode }}
+            </tr>
+            <tr>
+                样本状态： {{ sample.status }}
+            </tr>
+        </table>
+    </div>
+{% endblock %}
