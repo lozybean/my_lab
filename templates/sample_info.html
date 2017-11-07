@@ -21,8 +21,13 @@
                 <td> {{ sample.date_receive|date_format|display_none:'未记录' }}</td>
             </tr>
             <tr>
-                <td class="col-md-3">采样时间</td>
+                <td class="col-md-3">采样时间:</td>
                 <td>{{ sample.date_sampling|date_format|display_none:'未记录' }}</td>
+            </tr>
+            <tr>
+                <td class="col-md-3">受检者姓名：</td>
+                <td><a href="{% url 'subject_info' subject_id=sample.subject.id %}">
+                    {{ sample.subject.name }}</a></td>
             </tr>
         </table>
     </div>

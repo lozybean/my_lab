@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load display_none %}
+{% load date_format %}
+{% load bootstrap3 %}
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">受检者基本信息</div>
+        <table class="table table-responsive">
+            <tr>
+                <th class="col-md-1">姓名：</th>
+                <td class="text-left col-md-1">{{ subject.name }}</td>
+                <th class="col-md-1">性别：</th>
+                <td class="text-left col-md-1">{{ subject.get_gender_display }}</td>
+                <th class="col-md-1">年龄：</th>
+                <td class="text-left col-md-1">{{ subject.age }}</td>
+            </tr>
+            <tr>
+                <th class="col-md-1">名族：</th>
+                <td class="text-left col-md-1">{{ subject.nationality }}</td>
+                <th class="col-md-1">籍贯：</th>
+                <td class="text-left col-md-1">{{ subject.native_place }}</td>
+                <th class="col-md-1">送检医院：</th>
+                <td class="text-left col-md-1">{{ subject.hospital }}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="form-group">
+        <label for="diagnosis">临床诊断：</label>
+        <div>
+        <textarea name="diagnosis" id="diagnosis" cols="30" rows="5"
+                  class="form-control" readonly>
+            {{ subject.diagnosis }}
+        </textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="diagnosis">家族史：</label>
+        <div>
+        <textarea name="diagnosis" id="diagnosis" cols="30" rows="5"
+                  class="form-control" readonly>
+            {{ subject.family_history }}
+        </textarea>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">所有送检样本信息</div>
+        <table class="table table-responsive">
+            <thead>
+            <tr>
+                <th class="text-center">样本名称</th>
+                <th class="text-center">样本条码</th>
+                <th class="text-center">接收时间</th>
+                <th class="text-center">所做项目</th>
+            </tr>
+            </thead>
+            {% for sample in sample_list %}
+                <tr>
+                    <td><a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.name }}</a></td>
+                    <td>{{ sample.barcode }}</td>
+                    <td>{{ sample.date_receive|date_format|display_none }}</td>
+                    <td>{{ sample.project }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">家系信息</div>
+        <table class="table table-responsive">
+            <thead>
+            <tr>
+                <th class="text-center">姓名：</th>
+                <th class="text-center">性别：</th>
+                <th class="text-center">年龄：</th>
+                <th class="text-center">关系：</th>
+                <th class="text-center">临床诊断：</th>
+            </tr>
+            </thead>
+            {% for subject in family %}
+                <tr>
+                    <td><a href="{% url 'subject_info' subject_id=subject.id %}">{{ subject.name }}</a></td>
+                    <td>{{ subject.get_gender_display }}</td>
+                    <td>{{ subject.age }}</td>
+                    <td>{{ subject.relation_ship }}</td>
+                    <td>{{ subject.diagnosis }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

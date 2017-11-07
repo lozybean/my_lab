@@ -1,7 +1,7 @@
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from sample_manage.form import LoginForm
-from sample_manage.models import SampleInfo
+from sample_manage.models import SampleInfo, SubjectInfo
 
 
 # Create your views here.
@@ -41,3 +41,18 @@ def sample_list(request):
     samples = get_list_or_404(SampleInfo)
     is_auth = request.user.is_authenticated()
     return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': is_auth})
+
+
+def subject_info(request, subject_id):
+    subject = get_object_or_404(SubjectInfo, id=subject_id)
+    samples = SampleInfo.objects.filter(subject=subject)
+    family = SubjectInfo.objects.filter(family=subject.family)
+    is_auth = request.user.is_authenticated()
+    return render(request, 'subject_info.html', {'subject': subject, 'is_auth': is_auth,
+                                                 'sample_list': samples, 'family': family})
+
+
+def subject_list(request):
+    subjects = get_list_or_404(SubjectInfo)
+    is_auth = request.user.is_authenticated()
+    return render(request, 'subject_list.html', {'subject_list': subjects, 'is_auth': is_auth})

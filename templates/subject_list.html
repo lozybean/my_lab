@@ -8,41 +8,33 @@
             <thead class="thead-default">
             <tr>
                 <th width="20%" class="text-center">
-                    样本名称
-                </th>
-                <th width="20%" class="text-center">
-                    样本条码
-                </th>
-                <th width="20%" class="text-center">
-                    接收时间
-                </th>
-                <th width="20%" class="text-center">
-                    所做项目
-                </th>
-                <th width="20%" class="text-center">
                     受检者姓名
+                </th>
+                <th width="20%" class="text-center">
+                    性别
+                </th>
+                <th width="20%" class="text-center">
+                    年龄
+                </th>
+                <th width="40%" class="text-center">
+                    临床诊断
                 </th>
             </tr>
             </thead>
             <tbody>
-            {% for sample in sample_list %}
+            {% for subject in subject_list %}
                 <tr>
                     <td>
-                        <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.name }}</a>
+                        <a href="{% url 'subject_info' subject_id=subject.id %}">{{ subject.name }}</a>
                     </td>
                     <td>
-                        {{ sample.barcode }}
+                        {{ subject.get_gender_display }}
                     </td>
                     <td>
-                        {{ sample.date_receive|date_format|display_none:'未记录' }}
+                        {{ subject.age }}
                     </td>
                     <td>
-                        {{ sample.project.name }}
-                    </td>
-                    <td>
-                        <a href="{% url 'subject_info' subject_id=sample.subject.id %}">
-                            {{ sample.subject.name|display_none:'无' }}
-                        </a>
+                        {{ subject.diagnosis }}
                     </td>
                 </tr>
             {% endfor %}
