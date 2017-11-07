@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^subject_info/(?P<subject_id>\d+)$', views.subject_info, name='subject_info'),
     url(r'^login/$', views.login, name='login'),
     url(r'^logout/$', views.logout, name='logout'),
+    url(r'^user_info/$', views.user_info, name='user_info'),
 ]

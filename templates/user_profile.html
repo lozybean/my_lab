@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load display_none %}
+{% load date_format %}
+{% block content %}
+    <div class="panel panel-default">
+
+        <div class="panel-heading text-center">我的信息</div>
+
+        <table class="table table-responsive" id="sample_info_table">
+            <col width="20%">
+            <col width="30%">
+            <col width="20%">
+            <col width="30%">
+
+            <tr>
+                <th>用户名：</th>
+                <td>{{ user.username }}</td>
+                <th>部门/小组：</th>
+                <td>{{ user_profile.department }}</td>
+            </tr>
+            <tr>
+                <th>姓名：</th>
+                <td>{{ user.get_full_name }}</td>
+                <th>邮件：</th>
+                <td>{{ user.email }}</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

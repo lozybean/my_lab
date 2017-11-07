@@ -40,10 +40,10 @@
             <ul class="nav navbar-right navbar-nav">
                 {% if is_auth %}
                     <li><a href="{% url 'logout' %}">登出</a></li>
+                    <li><a href="{% url 'user_info' %}">我的信息/{{ is_auth.username }}</a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}">登录</a></li>
                 {% endif %}
-                <li><a href="#">我的信息</a></li>
             </ul>
             {#                        <ul class="nav navbar-nav navbar-right">#}
             {#                            <li><a href="#">Link</a></li>#}

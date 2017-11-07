@@ -1,7 +1,7 @@
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from sample_manage.form import LoginForm
-from sample_manage.models import SampleInfo, SubjectInfo
+from sample_manage.models import SampleInfo, SubjectInfo, UserProfile
 
 
 # Create your views here.
@@ -31,28 +31,45 @@ def logout(request):
     return redirect(login)
 
 
+def user_info(request):
+    user = get_auth_user(request)
+    if not user:
+        return redirect(login)
+    user_profile = UserProfile.objects.filter(user=user)
+    return render(request, 'user_profile.html', {'user_profile': user_profile,
+                                                 'user': user, 'is_auth': user})
+
+
+def get_auth_user(request):
+    if request.user.is_authenticated():
+        auth_user = auth.get_user(request)
+    else:
+        auth_user = False
+    return auth_user
+
+
 def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
-    is_auth = request.user.is_authenticated()
-    return render(request, 'sample_info.html', {'sample': sample, 'is_auth': is_auth})
+    auth_user = get_auth_user(request)
+    return render(request, 'sample_info.html', {'sample': sample, 'is_auth': auth_user})
 
 
 def sample_list(request):
     samples = get_list_or_404(SampleInfo)
-    is_auth = request.user.is_authenticated()
-    return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': is_auth})
+    auth_user = get_auth_user(request)
+    return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
 
 
 def subject_info(request, subject_id):
     subject = get_object_or_404(SubjectInfo, id=subject_id)
     samples = SampleInfo.objects.filter(subject=subject)
     family = SubjectInfo.objects.filter(family=subject.family)
-    is_auth = request.user.is_authenticated()
-    return render(request, 'subject_info.html', {'subject': subject, 'is_auth': is_auth,
+    auth_user = get_auth_user(request)
+    return render(request, 'subject_info.html', {'subject': subject, 'is_auth': auth_user,
                                                  'sample_list': samples, 'family': family})
 
 
 def subject_list(request):
     subjects = get_list_or_404(SubjectInfo)
-    is_auth = request.user.is_authenticated()
-    return render(request, 'subject_list.html', {'subject_list': subjects, 'is_auth': is_auth})
+    auth_user = get_auth_user(request)
+    return render(request, 'subject_list.html', {'subject_list': subjects, 'is_auth': auth_user})
