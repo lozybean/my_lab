@@ -38,7 +38,11 @@
                 <button type="submit" class="btn btn-default">Submit</button>
             </form>
             <ul class="nav navbar-right navbar-nav">
-                <li><a href="#">登录</a></li>
+                {% if is_auth %}
+                    <li><a href="{% url 'logout' %}">登出</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">登录</a></li>
+                {% endif %}
                 <li><a href="#">我的信息</a></li>
             </ul>
             {#                        <ul class="nav navbar-nav navbar-right">#}
