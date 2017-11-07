@@ -2,11 +2,26 @@
     width: 100%;
 }
 
-table thead.thead-default{
+table#sample_info_table {
+
+}
+table thead th{
+    text-align: center;
+}
+table tbody tr th {
+    text-align: center;
+    background: #f5f5f5;
+}
+
+table tbody tr td {
+    text-align: center;
+}
+
+table thead.thead-default {
     background: #e7e7e7;
 }
 
-.content{
+.content {
     text-align: center;
 }
 

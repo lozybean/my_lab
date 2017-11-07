@@ -7,115 +7,178 @@
 
         <div class="panel-heading text-center">基本信息</div>
 
-        <table class="table table-responsive">
+        <table class="table table-responsive" id="sample_info_table">
+            <col width="20%">
+            <col width="30%">
+            <col width="20%">
+            <col width="30%">
+
             <tr>
-                <td class="col-md-3">样本名称：</td>
+                <th>样本名称：</th>
                 <td>{{ sample.name }}</td>
-            </tr>
-            <tr>
-                <td class="col-md-3">样本条码号：</td>
+                <th>样本条码号：</th>
                 <td>{{ sample.barcode }}</td>
             </tr>
             <tr>
-                <td class="col-md-3">收样时间：</td>
-                <td> {{ sample.date_receive|date_format|display_none:'未记录' }}</td>
-            </tr>
-            <tr>
-                <td class="col-md-3">采样时间:</td>
-                <td>{{ sample.date_sampling|date_format|display_none:'未记录' }}</td>
-            </tr>
-            <tr>
-                <td class="col-md-3">受检者姓名：</td>
+                <th>受检者姓名：</th>
                 <td><a href="{% url 'subject_info' subject_id=sample.subject.id %}">
-                    {{ sample.subject.name }}</a></td>
+                    {{ sample.subject.name }}
+                </a></td>
+                <th>样本状态：</th>
+                <td>{{ sample.get_status_display }}</td>
             </tr>
+            <tr>
+                <th>所做项目：</th>
+                <td>{{ sample.project }}</td>
+                <th>送检医院：</th>
+                <td>{{ sample.hospital|display_none:'-' }}</td>
+
+            </tr>
+            <tr>
+                <th>样本类型：</th>
+                <td>{{ sample.type }}</td>
+                <th>样本量</th>
+                <td>{{ sample.quantity }}</td>
+            </tr>
+
+            <tr>
+                <th>收样时间：</th>
+                <td>{{ sample.date_receive|date_format|display_none:'未登记' }}</td>
+                <th>截止时间：</th>
+                <td>{{ sample.date_deadline|date_format|display_none:'未登记' }}</td>
+            </tr>
+            <tr>
+                <th>INDEX1</th>
+                <td>{{ sample.index1_seq|display_none:'无' }}</td>
+                <th>INDEX2</th>
+                <td>{{ sample.index2_seq|display_none:'无' }}</td>
+            </tr>
+            {#            <tr>#}
+            {#            </tr>#}
+            {#            <tr>#}
+            {#                <td class="col-md-3">收样时间：</td>#}
+            {#                <td> {{ sample.date_receive|date_format|display_none:'未记录' }}</td>#}
+            {#            </tr>#}
+            {#            <tr>#}
+            {#                <td class="col-md-3">采样时间:</td>#}
+            {#                <td>{{ sample.date_sampling|date_format|display_none:'未记录' }}</td>#}
+            {#            </tr>#}
+            {#            <tr>#}
+            {#                <td class="col-md-3">受检者姓名：</td>#}
+            {#                <td><a href="{% url 'subject_info' subject_id=sample.subject.id %}">#}
+            {#                    {{ sample.subject.name }}</a></td>#}
+            {#            </tr>#}
         </table>
     </div>
 
-    <form class="form-inline">
-
-        <div class="form-group row">
-            <label for="sample_status">样本状态：</label>
-            <select class="form-control" id="sample_status">
-                <option>{{ sample.get_status_display }}</option>
-                {% for status in sample.STATUS %}
-                    {% if status.0 != sample.status %}
-                        <option value="{{ status.0 }}">{{ status.1 }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-        </div>
-    </form>
+    {#    <form class="form-inline">#}
+    {##}
+    {#        <div class="form-group row">#}
+    {#            <label for="sample_status">样本状态：</label>#}
+    {#            <select class="form-control" id="sample_status">#}
+    {#                <option>{{ sample.get_status_display }}</option>#}
+    {#                {% for status in sample.STATUS %}#}
+    {#                    {% if status.0 != sample.status %}#}
+    {#                        <option value="{{ status.0 }}">{{ status.1 }}</option>#}
+    {#                    {% endif %}#}
+    {#                {% endfor %}#}
+    {#            </select>#}
+    {#        </div>#}
+    {#    </form>#}
     <div class="panel panel-default">
-        <div class="panel-heading text-center">各步骤进度及时间</div>
+        <div class="panel-heading text-center">各步骤进度及时间
+            （目前样本状态：<b>{{ sample.get_status_display }}</b>）
+        </div>
         <table class="table table-responsive">
             <thead class="thead-default">
+            <col width="25%">
+            <col width="25%">
+            <col width="25%">
+            <col width="25%">
             <tr>
-                <th width="30%" class="text-center">
+                <th>
                     状态
                 </th>
-                <th width="40%" class="text-center">
+                <th>
                     开始时间
                 </th>
-                <th width="40%" class="text-center">
+                <th>
                     结束时间
+                </th>
+                <th>
+                    操作人
                 </th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td>
+                <th>
                     DNA提取
-                </td>
+                </th>
                 <td>
                     {{ sample.date_dna_extract_begin|display_none:'未开始' }}
                 </td>
                 <td>
                     {{ sample.date_dna_extract_end|display_none:'未结束' }}
                 </td>
+                <td>
+                    {{ sample.operator_dna_extract|display_none:'无' }}
+                </td>
             </tr>
             <tr>
-                <td>
+                <th>
                     文库构建
-                </td>
+                </th>
                 <td>
                     {{ sample.date_lib_build_begin|display_none:'未开始' }}
                 </td>
                 <td>
                     {{ sample.date_lib_build_end|display_none:'未结束' }}
                 </td>
+                <td>
+                    {{ sample.operator_lib_build|display_none:'无' }}
+                </td>
             </tr>
             <tr>
-                <td>
+                <th>
                     上机
-                </td>
+                </th>
                 <td>
                     {{ sample.date_sequencing_begin|display_none:'未开始' }}
                 </td>
                 <td>
                     {{ sample.date_sequencing_end|display_none:'未结束' }}
                 </td>
+                <td>
+                    {{ sample.operator_sequencing|display_none:'无' }}
+                </td>
             </tr>
             <tr>
-                <td>
+                <th>
                     生物信息分析
-                </td>
+                </th>
                 <td>
                     {{ sample.date_bioinfo_begin|display_none:'未开始' }}
                 </td>
                 <td>
                     {{ sample.date_bioinfo_end|display_none:'未结束' }}
                 </td>
+                <td>
+                    {{ sample.operator_bioinfo|display_none:'无' }}
+                </td>
             </tr>
             <tr>
-                <td>
+                <th>
                     报告撰写
-                </td>
+                </th>
                 <td>
                     {{ sample.date_report_begin|display_none:'未开始' }}
                 </td>
                 <td>
                     {{ sample.date_report_end|display_none:'未结束' }}
+                </td>
+                <td>
+                    {{ sample.operator_report|display_none:'无' }}
                 </td>
             </tr>
             </tbody>

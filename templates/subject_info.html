@@ -7,20 +7,20 @@
         <div class="panel-heading text-center">受检者基本信息</div>
         <table class="table table-responsive">
             <tr>
-                <th class="col-md-1">姓名：</th>
-                <td class="text-left col-md-1">{{ subject.name }}</td>
-                <th class="col-md-1">性别：</th>
-                <td class="text-left col-md-1">{{ subject.get_gender_display }}</td>
-                <th class="col-md-1">年龄：</th>
-                <td class="text-left col-md-1">{{ subject.age }}</td>
+                <th>姓名：</th>
+                <td>{{ subject.name }}</td>
+                <th>性别：</th>
+                <td>{{ subject.get_gender_display }}</td>
+                <th>年龄：</th>
+                <td>{{ subject.age }}</td>
             </tr>
             <tr>
-                <th class="col-md-1">名族：</th>
-                <td class="text-left col-md-1">{{ subject.nationality }}</td>
-                <th class="col-md-1">籍贯：</th>
-                <td class="text-left col-md-1">{{ subject.native_place }}</td>
-                <th class="col-md-1">送检医院：</th>
-                <td class="text-left col-md-1">{{ subject.hospital }}</td>
+                <th>名族：</th>
+                <td>{{ subject.nationality }}</td>
+                <th>籍贯：</th>
+                <td>{{ subject.native_place }}</td>
+                <th></th>
+                <td></td>
             </tr>
         </table>
     </div>
@@ -47,10 +47,10 @@
         <table class="table table-responsive">
             <thead>
             <tr>
-                <th class="text-center">样本名称</th>
-                <th class="text-center">样本条码</th>
-                <th class="text-center">接收时间</th>
-                <th class="text-center">所做项目</th>
+                <th>样本名称</th>
+                <th>样本条码</th>
+                <th>接收时间</th>
+                <th>所做项目</th>
             </tr>
             </thead>
             {% for sample in sample_list %}
@@ -68,11 +68,11 @@
         <table class="table table-responsive">
             <thead>
             <tr>
-                <th class="text-center">姓名：</th>
-                <th class="text-center">性别：</th>
-                <th class="text-center">年龄：</th>
-                <th class="text-center">关系：</th>
-                <th class="text-center">临床诊断：</th>
+                <th width="15%">姓名</th>
+                <th width="15%">性别</th>
+                <th width="15%">年龄</th>
+                <th width="15%">关系</th>
+                <th width="40%">临床诊断</th>
             </tr>
             </thead>
             {% for subject in family %}

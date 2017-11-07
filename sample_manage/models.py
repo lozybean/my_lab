@@ -1,7 +1,17 @@
+from django.conf import settings
+from django.contrib.auth.models import User, AbstractUser
 from django.db import models
 
 
 # Create your models here.
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    department = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.user.get_username()
+
 
 class Project(models.Model):
     name = models.TextField(null=True, blank=True)
@@ -25,7 +35,6 @@ class SubjectInfo(models.Model):
     age = models.IntegerField(blank=True, null=True)
     nationality = models.CharField(max_length=20, default='汉族')
     native_place = models.CharField(max_length=10)
-    hospital = models.TextField(blank=True, null=True)
     diagnosis = models.TextField(blank=True, null=True)
     family_history = models.TextField(blank=True, null=True)
 
@@ -48,11 +57,13 @@ class SampleInfo(models.Model):
               ('report', '报告撰写'),)
     name = models.CharField(max_length=20)
     barcode = models.CharField(max_length=50)
+
     type = models.CharField(max_length=50, blank=True, null=True)
     quantity = models.CharField(max_length=50, blank=True, null=True)
 
     project = models.ForeignKey(Project, blank=True, null=True)
 
+    hospital = models.TextField(blank=True, null=True)
     subject = models.ForeignKey(SubjectInfo, blank=True, null=True)
 
     index1_seq = models.CharField(max_length=20, blank=True, null=True)
@@ -64,14 +75,28 @@ class SampleInfo(models.Model):
 
     date_dna_extract_begin = models.DateTimeField(blank=True, null=True)
     date_dna_extract_end = models.DateTimeField(blank=True, null=True)
+    operator_dna_extract = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                             related_name='%(app_label)s_%(class)s_dna_extract')
+
     date_lib_build_begin = models.DateTimeField(blank=True, null=True)
     date_lib_build_end = models.DateTimeField(blank=True, null=True)
+    operator_lib_build = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                           related_name='%(app_label)s_%(class)s_lib_build')
+
     date_sequencing_begin = models.DateTimeField(blank=True, null=True)
     date_sequencing_end = models.DateTimeField(blank=True, null=True)
+    operator_sequencing = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                            related_name='%(app_label)s_%(class)s_sequencing')
+
     date_bioinfo_begin = models.DateTimeField(blank=True, null=True)
     date_bioinfo_end = models.DateTimeField(blank=True, null=True)
+    operator_bioinfo = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                         related_name='%(app_label)s_%(class)s_bioinfo')
+
     date_report_begin = models.DateTimeField(blank=True, null=True)
     date_report_end = models.DateTimeField(blank=True, null=True)
+    operator_report = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                        related_name='%(app_label)s_%(class)s_report')
 
     status = models.CharField(max_length=30, choices=STATUS)
 
