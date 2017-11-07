@@ -8,9 +8,15 @@ class Project(models.Model):
 
     period_day = models.IntegerField()
 
+    def __str__(self):
+        return self.name
+
 
 class FamilyInfo(models.Model):
     proband = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"先证者：{self.proband}"
 
 
 class SubjectInfo(models.Model):
@@ -26,6 +32,9 @@ class SubjectInfo(models.Model):
     family = models.ForeignKey(FamilyInfo)
     relation_ship = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class SampleInfo(models.Model):
     STATUS = (('sample_received', '收样'),
@@ -39,9 +48,9 @@ class SampleInfo(models.Model):
     type = models.CharField(max_length=50, blank=True, null=True)
     quantity = models.CharField(max_length=50, blank=True, null=True)
 
-    # project = models.ForeignKey(Project)
-    #
-    # subject = models.ForeignKey(SubjectInfo)
+    project = models.ForeignKey(Project, blank=True, null=True)
+
+    subject = models.ForeignKey(SubjectInfo, blank=True, null=True)
 
     index1_seq = models.CharField(max_length=20, blank=True, null=True)
     index2_seq = models.CharField(max_length=20, blank=True, null=True)
@@ -65,6 +74,9 @@ class SampleInfo(models.Model):
 
     has_request_note = models.BooleanField(default=True)
     has_informed_note = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-date_receive']
 
     def __str__(self):
         return self.name

@@ -1,11 +1,52 @@
 {% extends 'base.html' %}
-
+{% load date_format %}
+{% load display_none %}
 {% block content %}
-    <ul>
-        {% for sample in sample_list %}
-            <li>
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">样本列表</div>
+        <table class="table table-responsive">
+            <thead class="thead-default">
+            <tr>
+                <th width="20%" class="text-center">
+                    样本名称
+                </th>
+                <th width="20%" class="text-center">
+                    样本条码
+                </th>
+                <th width="20%" class="text-center">
+                    接收时间
+                </th>
+                <th width="20%" class="text-center">
+                    所做项目
+                </th>
+                <th width="20%" class="text-center">
+                    受检者姓名
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sample in sample_list %}
+                <tr>
+                    <td>
+                        <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.name }}</a>
+                    </td>
+                    <td>
+                        {{ sample.barcode }}
+                    </td>
+                    <td>
+                        {{ sample.date_receive|date_format|display_none:'未记录' }}
+                    </td>
+                    <td>
+                        {{ sample.project.name }}
+                    </td>
+                    <td>
+                        {{ sample.subject.name|display_none:'无' }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
 
-            </li>
-        {% endfor %}
-    </ul>
+        </table>
+    </div>
+
 {% endblock %}

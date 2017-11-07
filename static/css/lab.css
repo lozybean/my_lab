@@ -1,5 +1,13 @@
-#layout {
+#body {
     width: 100%;
+}
+
+table thead.thead-default{
+    background: #e7e7e7;
+}
+
+.content{
+    text-align: center;
 }
 
 .custom-restricted-width {

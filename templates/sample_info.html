@@ -1,78 +1,63 @@
 {% extends 'base.html' %}
 {% load display_none %}
 {% load date_format %}
+{% load bootstrap3 %}
 {% block content %}
-    <div>
-        <table id="base_info">
-            <tr>
-                <td>
+    <div class="panel panel-default">
 
-                    样本名称：
-                </td>
-                <td>
-                    {{ sample.name }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    样本条码号：
-                </td>
-                <td>
-                    {{ sample.barcode }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    收样时间：
-                </td>
-                <td>
-                    {{ sample.date_receive|date_format|display_none }}
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    采样时间：
-                </td>
-                <td>
+        <div class="panel-heading text-center">基本信息</div>
 
-                    {{ sample.date_sampling|date_format|display_none:'未记录' }}
-                </td>
+        <table class="table table-responsive">
+            <tr>
+                <td class="col-md-3">样本名称：</td>
+                <td>{{ sample.name }}</td>
             </tr>
             <tr>
-                <td>
-                    样本状态：
-                </td>
-                <td>
-                    <div class="select">
-                        <select name="sample_status" id="sample_status">
-                            <option>{{ sample.get_status_display }}</option>
-                            {% for status in sample.STATUS %}
-                                {% if status.0 != sample.status %}
-                                    <option value="{{ status.0 }}">{{ status.1 }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                </td>
+                <td class="col-md-3">样本条码号：</td>
+                <td>{{ sample.barcode }}</td>
+            </tr>
+            <tr>
+                <td class="col-md-3">收样时间：</td>
+                <td> {{ sample.date_receive|date_format|display_none:'未记录' }}</td>
+            </tr>
+            <tr>
+                <td class="col-md-3">采样时间</td>
+                <td>{{ sample.date_sampling|date_format|display_none:'未记录' }}</td>
             </tr>
         </table>
-        <table border="1">
-            <thead>
+    </div>
+
+    <form class="form-inline">
+
+        <div class="form-group row">
+            <label for="sample_status">样本状态：</label>
+            <select class="form-control" id="sample_status">
+                <option>{{ sample.get_status_display }}</option>
+                {% for status in sample.STATUS %}
+                    {% if status.0 != sample.status %}
+                        <option value="{{ status.0 }}">{{ status.1 }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">各步骤进度及时间</div>
+        <table class="table table-responsive">
+            <thead class="thead-default">
             <tr>
-                <td width="30%">
+                <th width="30%" class="text-center">
                     状态
-                </td>
-                <td width="40%">
+                </th>
+                <th width="40%" class="text-center">
                     开始时间
-                </td>
-                <td width="40%">
+                </th>
+                <th width="40%" class="text-center">
                     结束时间
-                </td>
+                </th>
             </tr>
             </thead>
             <tbody>
-
-
             <tr>
                 <td>
                     DNA提取

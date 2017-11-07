@@ -1,32 +1,27 @@
 <!--base.html-->
 {% load static %}
+{% load bootstrap3 %}
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>my lab</title>
-    <link rel="stylesheet" href="{% static 'css/pure-min.css' %}">
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {#    <link rel="stylesheet" href="{% static 'css/pure-min.css' %}">#}
     <link rel="stylesheet" href="{% static 'css/lab.css' %}">
 </head>
 
 <body>
-<div id="layout" class="pure-g">
-    <div class="sidebar pure-u-1-4">
-        <div class="pure-menu custom-restricted-width">
-            <span class="pure-menu-heading">My Lab实验室样品管理系统</span>
+<div id="body" class="row">
 
-            <ul class="pure-menu-list">
-                <li class="pure-menu-item"><a href="#" class="pure-menu-link">样本信息</a></li>
-                <li class="pure-menu-item"><a href="#" class="pure-menu-link">患者信息</a></li>
-                <li class="pure-menu-item"><a href="#" class="pure-menu-link">Sports</a></li>
-                <li class="pure-menu-item"><a href="#" class="pure-menu-link">Finance</a></li>
-            </ul>
-        </div>
+    <div class="content col-md-6 col-md-offset-3">
+        {% include 'navbar.html' %}
     </div>
-
-
-    <div class="content pure-u-3-4">
+    <br>
+    <br>
+    <div class="content col-md-6 col-md-offset-3">
         <div>
             {% block content %}
             {% endblock %}
