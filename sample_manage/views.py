@@ -1,7 +1,7 @@
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
-from sample_manage.form import LoginForm
-from sample_manage.models import SampleInfo, SubjectInfo, UserProfile
+from sample_manage.form import LoginForm, SampleInfoForm
+from sample_manage.models import SampleInfo, SubjectInfo, UserProfile, SamplePipe
 
 
 # Create your views here.
@@ -9,6 +9,7 @@ from sample_manage.models import SampleInfo, SubjectInfo, UserProfile
 def login(request):
     if request.method == 'GET':
         form = LoginForm()
+
         return render(request, 'login.html', {'form': form})
     else:
         form = LoginForm(request.POST)
@@ -51,7 +52,9 @@ def get_auth_user(request):
 def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
     auth_user = get_auth_user(request)
-    return render(request, 'sample_info.html', {'sample': sample, 'is_auth': auth_user})
+    sample_pipe = SamplePipe.objects.filter(sample=sample, latest=True)
+    return render(request, 'sample_info.html', {'sample': sample, 'is_auth': auth_user,
+                                                'sample_pipe': sample_pipe})
 
 
 def sample_list(request):
@@ -73,3 +76,18 @@ def subject_list(request):
     subjects = get_list_or_404(SubjectInfo)
     auth_user = get_auth_user(request)
     return render(request, 'subject_list.html', {'subject_list': subjects, 'is_auth': auth_user})
+
+
+def sample_input(request):
+    auth_user = get_auth_user(request)
+    if request.method == 'GET':
+        form = SampleInfoForm()
+        return render(request, 'input_sample.html', {'form': form, 'is_auth': auth_user})
+    else:
+        form = SampleInfoForm(request.POST)
+        if form.is_valid():
+            sample_name = request.POST.get('sample_name', '')
+            sample_barcode = request.POST.get('sample_barcode', '')
+            return render(request, 'input_sample.html', {'form': form, 'is_auth': auth_user})
+        else:
+            return render(request, 'input_sample.html', {'form': form, 'is_auth': auth_user})

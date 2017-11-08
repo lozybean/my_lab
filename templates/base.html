@@ -9,7 +9,11 @@
     <title>my lab</title>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <script src="{% bootstrap_jquery_url %}"></script>
     <link rel="stylesheet" href="{% static 'css/lab.css' %}">
+    {% if form %}
+        {{ form.media }}
+    {% endif %}
 </head>
 
 <body>

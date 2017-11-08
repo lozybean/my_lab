@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+    {% if error_message %}
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <h4>错误！</h4>
+            {{ error_message }}
+        </div>
+    {% endif %}
+    <div class="well">
+        <form class="form-horizontal" role="form" action="" method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+{#                    {% if field.type == 'text' %}#}
+                        {% bootstrap_field field field_class='col-md-8' label_class='col-md-2' %}
+{#                    {% endif %}#}
+                </div>
+            {% endfor %}
+            <p class="form-actions">
+                <input type="submit" value="录入" class="btn btn-primary">
+                <a href="#"><input type="button" value="放弃" class="btn btn-danger"></a>
+            </p>
+        </form>
+    </div>
+{% endblock %}

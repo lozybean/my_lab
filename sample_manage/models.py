@@ -48,17 +48,18 @@ class SubjectInfo(models.Model):
         ordering = ['-name']
 
 
+class SampleType(models.Model):
+    type = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.type
+
+
 class SampleInfo(models.Model):
-    STATUS = (('sample_received', '收样'),
-              ('DNA_extracted', 'DNA提取'),
-              ('lib_build', '文库构建'),
-              ('seq', '上机'),
-              ('bioinfo', '生信分析'),
-              ('report', '报告撰写'),)
     name = models.CharField(max_length=20)
     barcode = models.CharField(max_length=50)
 
-    type = models.CharField(max_length=50, blank=True, null=True)
+    type = models.ForeignKey(SampleType, blank=True, null=True)
     quantity = models.CharField(max_length=50, blank=True, null=True)
 
     project = models.ForeignKey(Project, blank=True, null=True)
@@ -72,6 +73,29 @@ class SampleInfo(models.Model):
     date_sampling = models.DateTimeField(blank=True, null=True)
     date_receive = models.DateTimeField(blank=True, null=True)
     date_deadline = models.DateTimeField(blank=True, null=True)
+
+    has_request_note = models.BooleanField(default=True)
+    has_informed_note = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-date_receive']
+
+    def __str__(self):
+        return self.name
+
+
+class SamplePipe(models.Model):
+    STATUS = (('sample_received', '收样'),
+              ('DNA_extracted', 'DNA提取'),
+              ('lib_build', '文库构建'),
+              ('seq', '上机'),
+              ('bioinfo', '生信分析'),
+              ('report', '报告撰写'),)
+
+    sample = models.ForeignKey(SampleInfo)
+    latest = models.BooleanField(default=True)
+
+    status = models.CharField(max_length=30, choices=STATUS, default='sample_received')
 
     date_dna_extract_begin = models.DateTimeField(blank=True, null=True)
     date_dna_extract_end = models.DateTimeField(blank=True, null=True)
@@ -97,14 +121,3 @@ class SampleInfo(models.Model):
     date_report_end = models.DateTimeField(blank=True, null=True)
     operator_report = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
                                         related_name='%(app_label)s_%(class)s_report')
-
-    status = models.CharField(max_length=30, choices=STATUS)
-
-    has_request_note = models.BooleanField(default=True)
-    has_informed_note = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ['-date_receive']
-
-    def __str__(self):
-        return self.name

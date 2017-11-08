@@ -87,7 +87,7 @@
     {#    </form>#}
     <div class="panel panel-default">
         <div class="panel-heading text-center">各步骤进度及时间
-            （目前样本状态：<b>{{ sample.get_status_display }}</b>）
+            （目前样本状态：<b>{{ sample_pipe.get_status_display }}</b>）
         </div>
         <table class="table table-responsive">
             <thead class="thead-default">
@@ -116,13 +116,13 @@
                     DNA提取
                 </th>
                 <td>
-                    {{ sample.date_dna_extract_begin|display_none:'未开始' }}
+                    {{ sample_pipe.date_dna_extract_begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample.date_dna_extract_end|display_none:'未结束' }}
+                    {{ sample_pipe.date_dna_extract_end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample.operator_dna_extract|display_none:'无' }}
+                    {{ sample_pipe.operator_dna_extract|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -130,13 +130,13 @@
                     文库构建
                 </th>
                 <td>
-                    {{ sample.date_lib_build_begin|display_none:'未开始' }}
+                    {{ sample_pipe.date_lib_build_begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample.date_lib_build_end|display_none:'未结束' }}
+                    {{ sample_pipe.date_lib_build_end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample.operator_lib_build|display_none:'无' }}
+                    {{ sample_pipe.operator_lib_build|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -144,13 +144,13 @@
                     上机
                 </th>
                 <td>
-                    {{ sample.date_sequencing_begin|display_none:'未开始' }}
+                    {{ sample_pipe.date_sequencing_begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample.date_sequencing_end|display_none:'未结束' }}
+                    {{ sample_pipe.date_sequencing_end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample.operator_sequencing|display_none:'无' }}
+                    {{ sample_pipe.operator_sequencing|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -158,13 +158,13 @@
                     生物信息分析
                 </th>
                 <td>
-                    {{ sample.date_bioinfo_begin|display_none:'未开始' }}
+                    {{ sample_pipe.date_bioinfo_begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample.date_bioinfo_end|display_none:'未结束' }}
+                    {{ sample_pipe.date_bioinfo_end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample.operator_bioinfo|display_none:'无' }}
+                    {{ sample_pipe.operator_bioinfo|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -172,13 +172,13 @@
                     报告撰写
                 </th>
                 <td>
-                    {{ sample.date_report_begin|display_none:'未开始' }}
+                    {{ sample_pipe.date_report_begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample.date_report_end|display_none:'未结束' }}
+                    {{ sample_pipe.date_report_end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample.operator_report|display_none:'无' }}
+                    {{ sample_pipe.operator_report|display_none:'无' }}
                 </td>
             </tr>
             </tbody>

@@ -8,8 +8,7 @@ register = template.Library()
 @register.filter(is_safe=True)
 @stringfilter
 def display_none(v, default='空'):
-    if v is None or v == 'None':
+    if v is None or v == 'None' or v == '':
         return mark_safe(default)
     else:
         return mark_safe(v)
-

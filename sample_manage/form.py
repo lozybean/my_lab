@@ -1,4 +1,5 @@
 from django import forms
+from sample_manage.models import SampleInfo, SampleType, Project
 
 
 class LoginForm(forms.Form):
@@ -28,3 +29,51 @@ class LoginForm(forms.Form):
             raise forms.ValidationError('请输入正确的用户名和密码')
         else:
             super().clean()
+
+
+class SampleInfoForm(forms.ModelForm):
+    name = forms.CharField(
+        required=True,
+        label='样本名称',
+        error_messages={'required': '必须输入样本名称'},
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '请输入样本名称(检测名称)',
+                'field_class': 'col-md-2'
+            }
+        )
+    )
+    barcode = forms.CharField(
+        required=True,
+        label='样本条码',
+        error_messages={'required': '必须输入条码号'},
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '请输入样本条码号',
+            }
+        )
+    )
+    type = forms.ModelChoiceField(
+        label='样本类型',
+        queryset=SampleType.objects
+    )
+    quantity = forms.CharField(
+        label='样本量',
+    )
+    project = forms.ModelChoiceField(
+        queryset=Project.objects,
+        label='项目类型',
+    )
+    hospital = forms.CharField(
+        label='送检医院',
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '送检医院/单位',
+            }
+        )
+    )
+
+    class Meta:
+        model = SampleInfo
+        fields = ['name', 'barcode', 'type', 'quantity', 'project',
+                  'hospital', 'subject']
