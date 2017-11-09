@@ -51,7 +51,13 @@
                         </a>
                     </td>
                     <td>
-                        {{ sample_pipe.get_status_display|display_none:'无' }}
+                        {% if sample_pipe.status %}
+                            <a href="{% url 'query_sample_by_status' status=sample_pipe.status %}">
+                                {{ sample_pipe.get_status_display|display_none:'无' }}
+                            </a>
+                        {% else %}
+                            {{ sample_pipe.get_status_display|display_none:'无' }}
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

@@ -82,7 +82,10 @@ class SampleInfo(models.Model):
 
 
 class DNAExtractStep(models.Model):
-    STATUS = 'DNA_extracted'
+    LABEL = 'DNA提取'
+    STATUS_PREVIOUS = 'sample_received'
+    STATUS = 'DNA_extract'
+    STATUS_NEXT = 'lib_build'
 
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
@@ -94,7 +97,10 @@ class DNAExtractStep(models.Model):
 
 
 class LibBuildStep(models.Model):
+    LABEL = '文库构建'
+    STATUS_PREVIOUS = 'dna_extract'
     STATUS = 'lib_build'
+    STATUS_NEXT = 'sequencing'
 
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
@@ -106,7 +112,10 @@ class LibBuildStep(models.Model):
 
 
 class SequencingStep(models.Model):
-    STATUS = 'seq'
+    LABEL = '上机测序'
+    STATUS_PREVIOUS = 'lib_build'
+    STATUS = 'sequencing'
+    STATUS_NEXT = 'bioinfo'
 
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
@@ -121,7 +130,10 @@ class SequencingStep(models.Model):
 
 
 class BioInfoStep(models.Model):
+    LABEL = '生信分析'
+    STATUS_PREVIOUS = 'sequencing'
     STATUS = 'bioinfo'
+    STATUS_NEXT = 'report'
 
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
@@ -133,7 +145,10 @@ class BioInfoStep(models.Model):
 
 
 class ReportStep(models.Model):
+    LABEL = '报告撰写'
+    STATUS_PREVIOUS = 'bioinfo'
     STATUS = 'report'
+    STATUS_NEXT = 'finish'
 
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
@@ -146,16 +161,20 @@ class ReportStep(models.Model):
 
 class SamplePipe(models.Model):
     STATUS = (('sample_received', '收样'),
-              ('DNA_extracted', 'DNA提取'),
+              ('dna_extract', 'DNA提取'),
               ('lib_build', '文库构建'),
-              ('seq', '上机'),
+              ('sequencing', '上机测序'),
               ('bioinfo', '生信分析'),
-              ('report', '报告撰写'),)
+              ('report', '报告撰写'),
+              ('finish', '完成检测'),)
+
+    # 实际操作的步骤
+    STEPS = [f'{i[0]}_step' for i in STATUS][1:-1]
 
     sample = models.ForeignKey(SampleInfo)
     latest = models.BooleanField(default=True)
 
-    status = models.CharField(max_length=30, choices=STATUS, default='sample_received')
+    status = models.CharField(max_length=30, choices=STATUS)
 
     dna_extract_step = models.ForeignKey(DNAExtractStep, blank=True, null=True)
 

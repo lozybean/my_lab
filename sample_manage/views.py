@@ -1,9 +1,12 @@
+from datetime import date
+
 from annoying.functions import get_object_or_None
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.utils.html import escape
 from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, UserProfile, SamplePipe
+from sample_manage.utils import get_samples_with_pipe, get_auth_user
 
 
 # Create your views here.
@@ -48,27 +51,36 @@ def user_info(request):
                                                  'user': user, 'is_auth': user})
 
 
-def get_auth_user(request):
-    if request.user.is_authenticated():
-        auth_user = auth.get_user(request)
-    else:
-        auth_user = False
-    return auth_user
-
-
 def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
     auth_user = get_auth_user(request)
     sample_pipe = get_object_or_None(SamplePipe, sample=sample, latest=True)
+    print(dir(sample_pipe))
+    print(sample_pipe.STEPS)
+    step = getattr(sample_pipe, sample_pipe.STEPS[0])
+    print(step.LABEL)
     return render(request, 'sample_info.html', {'sample': sample, 'is_auth': auth_user,
                                                 'sample_pipe': sample_pipe})
 
 
 def sample_list(request):
-    samples = get_list_or_404(SampleInfo)
     auth_user = get_auth_user(request)
-    sample_pipes = [get_object_or_None(SamplePipe, sample=sample, latest=True) for sample in samples]
-    samples = zip(samples, sample_pipes)
+    samples = get_samples_with_pipe()
+    return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
+
+
+def query_sample_by_status(request, status):
+    auth_user = get_auth_user(request)
+    samples = get_samples_with_pipe(can_be_none=False, status=status)
+    return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
+
+
+def query_sample_by_date(request, step, status, year, month, day):
+    auth_user = get_auth_user(request)
+    kwargs = {
+        f'{step.lower()}__{status}__date': date(int(year), int(month), int(day))
+    }
+    samples = get_samples_with_pipe(can_be_none=False, **kwargs)
     return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
 
 

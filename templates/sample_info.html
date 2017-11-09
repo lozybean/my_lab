@@ -2,6 +2,8 @@
 {% load display_none %}
 {% load date_format %}
 {% load bootstrap3 %}
+{% load set_var %}
+{% load get_attr %}
 {% block content %}
     <div class="panel panel-default">
 
@@ -82,76 +84,36 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <th>
-                    DNA提取
-                </th>
-                <td>
-                    {{ sample_pipe.dna_extract_step.begin|display_none:'未开始' }}
-                </td>
-                <td>
-                    {{ sample_pipe.dna_extract_step.end|display_none:'未结束' }}
-                </td>
-                <td>
-                    {{ sample_pipe.dna_extract_step.operator|display_none:'无' }}
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    文库构建
-                </th>
-                <td>
-                    {{ sample_pipe.lib_build_step.begin|display_none:'未开始' }}
-                </td>
-                <td>
-                    {{ sample_pipe.lib_build_step.end|display_none:'未结束' }}
-                </td>
-                <td>
-                    {{ sample_pipe.lib_build_step.operator|display_none:'无' }}
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    上机
-                </th>
-                <td>
-                    {{ sample_pipe.sequencing_step.begin|display_none:'未开始' }}
-                </td>
-                <td>
-                    {{ sample_pipe.sequencing_step.end|display_none:'未结束' }}
-                </td>
-                <td>
-                    {{ sample_pipe.sequencing_step.operator|display_none:'无' }}
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    生物信息分析
-                </th>
-                <td>
-                    {{ sample_pipe.bioinfo_step.begin|display_none:'未开始' }}
-                </td>
-                <td>
-                    {{ sample_pipe.bioinfo_step.end|display_none:'未结束' }}
-                </td>
-                <td>
-                    {{ sample_pipe.bioinfo_step.operator|display_none:'无' }}
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    报告撰写
-                </th>
-                <td>
-                    {{ sample_pipe.report_step.begin|display_none:'未开始' }}
-                </td>
-                <td>
-                    {{ sample_pipe.report_step.end|display_none:'未结束' }}
-                </td>
-                <td>
-                    {{ sample_pipe.report_step.operator|display_none:'无' }}
-                </td>
-            </tr>
+            {% for step_name in sample_pipe.STEPS %}
+                {% with sample_pipe|get_attr:step_name as step %}
+                    <tr>
+                        <th>
+                            LABEL{{ step.LABEL }}
+                        </th>
+                        <td>
+                            {% if step.begin %}
+                                <a href="{% url 'query_sample_by_date' step=step_name status='begin' year=step.begin.year month=step.begin.month day=step.begin.day %}">
+                                    {{ step.begin|date_format|display_none:'未开始' }}
+                                </a>
+                            {% else %}
+                                {{ step.begin|date_format|display_none:'未开始' }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if step.end %}
+                                <a href="{% url 'query_sample_by_date' step=step_name status='end' year=step.end.year month=step.end.month day=step.end.day %}">
+                                    {{ step.end|date_format|display_none:'未结束' }}
+                                </a>
+                            {% else %}
+                                {{ step.end|date_format|display_none:'未结束' }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ step.operator.get_full_name|display_none:'无' }}
+                        </td>
+                    </tr>
+                {% endwith %}
+            {% endfor %}
             </tbody>
 
         </table>

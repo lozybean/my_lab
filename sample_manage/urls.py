@@ -3,6 +3,9 @@ from sample_manage import views
 
 urlpatterns = [
     url(r'^sample_list/$', views.sample_list, name='sample_list'),
+    url(r'^sample_list/status/(?P<status>\w+)/$', views.query_sample_by_status, name='query_sample_by_status'),
+    url(r'^sample_list/date/(?P<step>\w+)/(?P<status>\w+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$',
+        views.query_sample_by_date, name='query_sample_by_date'),
     url(r'^subject_list/$', views.subject_list, name='subject_list'),
     url(r'^sample_info/(?P<sample_id>\d+)/$', views.sample_info, name='sample_info'),
     url(r'^subject_info/(?P<subject_id>\d+)$', views.subject_info, name='subject_info'),
