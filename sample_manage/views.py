@@ -1,13 +1,11 @@
-from datetime import date
+import datetime
 
-from annoying.functions import get_object_or_None
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.utils.html import escape
 from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, UserProfile, SamplePipe
-from sample_manage.utils import get_samples_with_pipe, get_auth_user
-
+from sample_manage.utils import get_auth_user
 
 # Create your views here.
 
@@ -54,40 +52,49 @@ def user_info(request):
 def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
     auth_user = get_auth_user(request)
-    sample_pipe = get_object_or_None(SamplePipe, sample=sample, latest=True)
-    print(dir(sample_pipe))
-    print(sample_pipe.STEPS)
-    step = getattr(sample_pipe, sample_pipe.STEPS[0])
-    print(step.LABEL)
-    return render(request, 'sample_info.html', {'sample': sample, 'is_auth': auth_user,
-                                                'sample_pipe': sample_pipe})
+    return render(request, 'sample_info.html', {'sample': sample, 'is_auth': auth_user})
 
 
 def sample_list(request):
     auth_user = get_auth_user(request)
-    samples = get_samples_with_pipe()
+    samples = get_list_or_404(SampleInfo)
+    return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
+
+
+def query_sample_by_project(request, project_id):
+    auth_user = get_auth_user(request)
+    samples = get_list_or_404(SampleInfo, project__id=project_id)
     return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
 
 
 def query_sample_by_status(request, status):
     auth_user = get_auth_user(request)
-    samples = get_samples_with_pipe(can_be_none=False, status=status)
+    samples = get_list_or_404(SampleInfo, sample_pipe__status=status)
     return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
 
 
-def query_sample_by_date(request, step, status, year, month, day):
+def query_sample_by_date(request, step, year, month, day, status=None):
     auth_user = get_auth_user(request)
-    kwargs = {
-        f'{step.lower()}__{status}__date': date(int(year), int(month), int(day))
-    }
-    samples = get_samples_with_pipe(can_be_none=False, **kwargs)
+    query_date = datetime.date(int(year), int(month), int(day))
+    if step == 'sample_received':
+        kwargs = {
+            f'date_receive__date': query_date
+        }
+    else:
+        kwargs = {
+            f'sample_pipe__{step.lower()}__{status}__date': query_date
+        }
+    samples = get_list_or_404(SampleInfo, **kwargs)
     return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
 
 
 def subject_info(request, subject_id):
     subject = get_object_or_404(SubjectInfo, id=subject_id)
     samples = SampleInfo.objects.filter(subject=subject)
-    family = SubjectInfo.objects.filter(family=subject.family)
+    if subject.family:
+        family = SubjectInfo.objects.filter(family=subject.family)
+    else:
+        family = None
     auth_user = get_auth_user(request)
     return render(request, 'subject_info.html', {'subject': subject, 'is_auth': auth_user,
                                                  'sample_list': samples, 'family': family})
@@ -107,6 +114,11 @@ def sample_input(request):
     else:
         form = SampleInfoForm(request.POST)
         if form.is_valid():
+            sample_pipe = SamplePipe()
+            sample_pipe.status = 'sample_received'
+            sample_pipe.save()
+            sample = form.instance
+            sample.sample_pipe = sample_pipe
             form.save()
             return redirect(message, message_text=escape('样本登记成功！'))
 
@@ -126,3 +138,28 @@ def subject_input(request):
             return redirect(message, message_text=escape('受检者登记成功！'))
         else:
             return render(request, 'form_input.html', {'form': form, 'is_auth': auth_user})
+
+
+def sample_pipe(request, step_name):
+    auth_user = get_auth_user(request)
+    if request.method == 'GET':
+        step_list = SamplePipe.STEPS
+        current_step_name = f'{step_name.lower()}_step'
+        step_index = step_list.index(current_step_name)
+        if step_index - 1 >= 0:
+            previous_step_name = step_list[step_index - 1]
+        else:
+            previous_step_name = None
+        print(current_step_name, previous_step_name)
+        kwargs = {
+            f'sample_pipe__{current_step_name}__begin__isnull': True,
+        }
+        if previous_step_name:
+            kwargs[f'sample_pipe__{previous_step_name}__end__isnull'] = False
+        samples = SampleInfo.objects.filter(**kwargs)
+        if samples:
+            return render(request, 'sample_pipe.html', {'sample_list': samples, 'is_auth': auth_user})
+        else:
+            return redirect(message, message_text='没有相关任务！')
+    else:
+        return redirect(message, message_text=escape('受检者登记成功！'))

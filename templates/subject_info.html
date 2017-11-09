@@ -63,7 +63,8 @@
             {% endfor %}
         </table>
     </div>
-    <div class="panel panel-default">
+    {% if family %}
+        <div class="panel panel-default">
         <div class="panel-heading text-center">家系信息</div>
         <table class="table table-responsive">
             <thead>
@@ -84,6 +85,8 @@
                     <td>{{ subject.diagnosis }}</td>
                 </tr>
             {% endfor %}
+
         </table>
-    </div>
+    {% endif %}
+</div>
 {% endblock %}

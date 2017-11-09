@@ -7,7 +7,13 @@ from django.db import models
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
-    department = models.CharField(max_length=100)
+
+    sample_received = models.BooleanField(default=False)
+    dna_extract = models.BooleanField(default=False)
+    lib_build = models.BooleanField(default=False)
+    sequencing = models.BooleanField(default=False)
+    bioinfo = models.BooleanField(default=False)
+    report = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.get_username()
@@ -38,8 +44,8 @@ class SubjectInfo(models.Model):
     diagnosis = models.TextField(blank=True, null=True)
     family_history = models.TextField(blank=True, null=True)
 
-    family = models.ForeignKey(FamilyInfo)
-    relation_ship = models.CharField(max_length=50)
+    family = models.ForeignKey(FamilyInfo, blank=True, null=True)
+    relation_ship = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -55,38 +61,7 @@ class SampleType(models.Model):
         return self.type
 
 
-class SampleInfo(models.Model):
-    name = models.CharField(max_length=20)
-    barcode = models.CharField(max_length=50, unique=True)
-
-    type = models.ForeignKey(SampleType, blank=True, null=True)
-    quantity = models.CharField(max_length=50, blank=True, null=True)
-
-    project = models.ForeignKey(Project, blank=True, null=True)
-
-    hospital = models.TextField(blank=True, null=True)
-    subject = models.ForeignKey(SubjectInfo, blank=True, null=True)
-
-    date_sampling = models.DateTimeField(blank=True, null=True)
-    date_receive = models.DateTimeField(blank=True, null=True)
-    date_deadline = models.DateTimeField(blank=True, null=True)
-
-    has_request_note = models.BooleanField(default=True)
-    has_informed_note = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ['-date_receive']
-
-    def __str__(self):
-        return f'{self.barcode}({self.name})'
-
-
 class DNAExtractStep(models.Model):
-    LABEL = 'DNA提取'
-    STATUS_PREVIOUS = 'sample_received'
-    STATUS = 'DNA_extract'
-    STATUS_NEXT = 'lib_build'
-
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
@@ -97,11 +72,6 @@ class DNAExtractStep(models.Model):
 
 
 class LibBuildStep(models.Model):
-    LABEL = '文库构建'
-    STATUS_PREVIOUS = 'dna_extract'
-    STATUS = 'lib_build'
-    STATUS_NEXT = 'sequencing'
-
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
@@ -112,11 +82,6 @@ class LibBuildStep(models.Model):
 
 
 class SequencingStep(models.Model):
-    LABEL = '上机测序'
-    STATUS_PREVIOUS = 'lib_build'
-    STATUS = 'sequencing'
-    STATUS_NEXT = 'bioinfo'
-
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
@@ -130,11 +95,6 @@ class SequencingStep(models.Model):
 
 
 class BioInfoStep(models.Model):
-    LABEL = '生信分析'
-    STATUS_PREVIOUS = 'sequencing'
-    STATUS = 'bioinfo'
-    STATUS_NEXT = 'report'
-
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
@@ -145,11 +105,6 @@ class BioInfoStep(models.Model):
 
 
 class ReportStep(models.Model):
-    LABEL = '报告撰写'
-    STATUS_PREVIOUS = 'bioinfo'
-    STATUS = 'report'
-    STATUS_NEXT = 'finish'
-
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
@@ -171,9 +126,6 @@ class SamplePipe(models.Model):
     # 实际操作的步骤
     STEPS = [f'{i[0]}_step' for i in STATUS][1:-1]
 
-    sample = models.ForeignKey(SampleInfo)
-    latest = models.BooleanField(default=True)
-
     status = models.CharField(max_length=30, choices=STATUS)
 
     dna_extract_step = models.ForeignKey(DNAExtractStep, blank=True, null=True)
@@ -185,3 +137,31 @@ class SamplePipe(models.Model):
     bioinfo_step = models.ForeignKey(BioInfoStep, blank=True, null=True)
 
     report_step = models.ForeignKey(ReportStep, blank=True, null=True)
+
+
+class SampleInfo(models.Model):
+    name = models.CharField(max_length=20)
+    barcode = models.CharField(max_length=50, unique=True)
+
+    type = models.ForeignKey(SampleType, blank=True, null=True)
+    quantity = models.CharField(max_length=50, blank=True, null=True)
+
+    project = models.ForeignKey(Project, blank=True, null=True)
+
+    hospital = models.TextField(blank=True, null=True)
+    subject = models.ForeignKey(SubjectInfo, blank=True, null=True)
+
+    date_sampling = models.DateTimeField(blank=True, null=True)
+    date_receive = models.DateTimeField(blank=True, null=True)
+    date_deadline = models.DateTimeField(blank=True, null=True)
+
+    has_request_note = models.BooleanField(default=True)
+    has_informed_note = models.BooleanField(default=True)
+
+    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True)
+
+    class Meta:
+        ordering = ['-date_receive']
+
+    def __str__(self):
+        return f'{self.barcode}({self.name})'

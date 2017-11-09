@@ -4,7 +4,9 @@
 {% load bootstrap3 %}
 {% load set_var %}
 {% load get_attr %}
+{% load get_status %}
 {% block content %}
+    {% set sample_pipe = sample.sample_pipe %}
     <div class="panel panel-default">
 
         <div class="panel-heading text-center">基本信息</div>
@@ -31,7 +33,11 @@
             </tr>
             <tr>
                 <th>所做项目：</th>
-                <td>{{ sample.project }}</td>
+                <td>
+                    <a href="{% url 'query_sample_by_project'  project_id=sample.project.id %}">
+                        {{ sample.project.name }}
+                    </a>
+                </td>
                 <th>送检医院：</th>
                 <td>{{ sample.hospital|display_none:'-' }}</td>
 
@@ -50,10 +56,27 @@
                 <td>{{ sample.date_deadline|date_format|display_none:'未登记' }}</td>
             </tr>
             <tr>
-                <th>INDEX1</th>
-                <td>{{ sample.index1_seq|display_none:'无' }}</td>
-                <th>INDEX2</th>
-                <td>{{ sample.index2_seq|display_none:'无' }}</td>
+                <th>
+                    检测申请单：
+                </th>
+                <td>
+                    {% if sample.has_request_note %}
+                        有
+                    {% else %}
+                        无
+                    {% endif %}
+
+                </td>
+                <th>
+                    知情同意书：
+                </th>
+                <td>
+                    {% if sample.has_informed_note %}
+                        有
+                    {% else %}
+                        无
+                    {% endif %}
+                </td>
             </tr>
         </table>
     </div>
@@ -84,11 +107,12 @@
             </tr>
             </thead>
             <tbody>
+
             {% for step_name in sample_pipe.STEPS %}
                 {% with sample_pipe|get_attr:step_name as step %}
                     <tr>
                         <th>
-                            LABEL{{ step.LABEL }}
+                            {{ sample_pipe|get_status:step_name }}
                         </th>
                         <td>
                             {% if step.begin %}

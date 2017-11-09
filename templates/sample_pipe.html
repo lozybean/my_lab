@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load date_format %}
+{% load display_none %}
+{% load set_var %}
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-heading text-center">样本列表</div>
+        <table class="table table-responsive">
+            <thead class="thead-default">
+            <tr>
+                <th width="15%" class="text-center">
+                    样本名称
+                </th>
+                <th width="15%" class="text-center">
+                    样本条码
+                </th>
+                <th width="25%" class="text-center">
+                    所做项目
+                </th>
+                <th width="15%" class="text-center">
+                    受检者姓名
+                </th>
+                <th width="20%" class="text-center">
+                    截止时间
+                </th>
+                <th width="10%" class="text-center">
+                    操作
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sample in sample_list %}
+                {% set sample_pipe = sample.sample_pipe %}
+                <tr>
+                    <td>
+                        <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.name }}</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.barcode }}</a>
+                    </td>
+                    <td>
+                        {{ sample.project.name }}
+                    </td>
+                    <td>
+                        <a href="{% url 'subject_info' subject_id=sample.subject.id %}">{{ sample.subject.name }}</a>
+                    </td>
+                    <td>
+                        {{ sample.date_deadline|date_format|display_none:'未记录' }}
+                    </td>
+                    <td>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+{% endblock %}

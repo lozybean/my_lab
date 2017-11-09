@@ -119,24 +119,29 @@ class SubjectInfoForm(forms.ModelForm):
     )
     nationality = forms.CharField(
         label='名族',
+        initial='汉族',
     )
     native_place = forms.CharField(
         label='籍贯',
     )
     diagnosis = forms.CharField(
         label='临床诊断',
+        required=False,
         widget=forms.Textarea()
     )
     family_history = forms.CharField(
         label='家族史',
+        required=False,
         widget=forms.Textarea()
     )
     family = forms.ModelChoiceField(
         label='家系',
+        required=False,
         queryset=FamilyInfo.objects,
     )
     relation_ship = forms.CharField(
         label='家系关系',
+        required=False,
         widget=forms.TextInput(
             attrs={
                 'placeholder': '和家系中先证者的关系',

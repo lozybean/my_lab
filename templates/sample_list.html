@@ -30,8 +30,7 @@
             </thead>
             <tbody>
             {% for sample in sample_list %}
-                {% set sample_pipe = sample.1 %}
-                {% set sample = sample.0 %}
+                {% set sample_pipe = sample.sample_pipe %}
                 <tr>
                     <td>
                         <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.name }}</a>
@@ -40,10 +39,19 @@
                         {{ sample.barcode }}
                     </td>
                     <td>
-                        {{ sample.date_receive|date_format|display_none:'未记录' }}
+                        {% if sample.date_receive %}
+                            <a href="{% url 'query_sample_by_date' step='sample_received' year=sample.date_receive.year month=sample.date_receive.month day=sample.date_receive.day status=1 %}">
+                                {{ sample.date_receive|date_format }}
+                            </a>
+                        {% else %}
+                            未记录
+                        {% endif %}
+
                     </td>
                     <td>
-                        {{ sample.project.name }}
+                        <a href="{% url 'query_sample_by_project'  project_id=sample.project.id %}">
+                            {{ sample.project.name }}
+                        </a>
                     </td>
                     <td>
                         <a href="{% url 'subject_info' subject_id=sample.subject.id %}">
