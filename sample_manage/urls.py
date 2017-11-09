@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^user_info/$', views.user_info, name='user_info'),
     url(r'^sample_input/$', views.sample_input, name='sample_input'),
+    url(r'^subject_input/$', views.subject_input, name='subject_input'),
     url(r'^message/(?P<message_text>[\w《》，。？：！…—]+)/$', views.message, name='message')
 ]

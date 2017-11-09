@@ -1,6 +1,7 @@
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
-from sample_manage.models import SampleInfo, SampleType, Project, SubjectInfo
+from sample_manage.models import (SampleInfo, SampleType, Project, SubjectInfo,
+                                  FamilyInfo)
 
 
 class LoginForm(forms.Form):
@@ -40,7 +41,6 @@ class SampleInfoForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'placeholder': '请输入样本名称(检测名称)',
-                'field_class': 'col-md-2'
             }
         )
     )
@@ -104,3 +104,46 @@ class SampleInfoForm(forms.ModelForm):
         model = SampleInfo
         fields = ['name', 'barcode', 'type', 'quantity', 'project',
                   'hospital', 'subject', 'date_receive', 'date_sampling', 'date_deadline']
+
+
+class SubjectInfoForm(forms.ModelForm):
+    name = forms.CharField(
+        label='受检者姓名'
+    )
+    gender = forms.ChoiceField(
+        label='性别',
+        choices=(('male', '男'), ('female', '女')),
+    )
+    age = forms.IntegerField(
+        label='年龄',
+    )
+    nationality = forms.CharField(
+        label='名族',
+    )
+    native_place = forms.CharField(
+        label='籍贯',
+    )
+    diagnosis = forms.CharField(
+        label='临床诊断',
+        widget=forms.Textarea()
+    )
+    family_history = forms.CharField(
+        label='家族史',
+        widget=forms.Textarea()
+    )
+    family = forms.ModelChoiceField(
+        label='家系',
+        queryset=FamilyInfo.objects,
+    )
+    relation_ship = forms.CharField(
+        label='家系关系',
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '和家系中先证者的关系',
+            }
+        )
+    )
+
+    class Meta:
+        model = SubjectInfo
+        fields = '__all__'

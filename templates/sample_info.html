@@ -87,13 +87,13 @@
                     DNA提取
                 </th>
                 <td>
-                    {{ sample_pipe.date_dna_extract_begin|display_none:'未开始' }}
+                    {{ sample_pipe.dna_extract_step.begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample_pipe.date_dna_extract_end|display_none:'未结束' }}
+                    {{ sample_pipe.dna_extract_step.end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample_pipe.operator_dna_extract|display_none:'无' }}
+                    {{ sample_pipe.dna_extract_step.operator|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -101,13 +101,13 @@
                     文库构建
                 </th>
                 <td>
-                    {{ sample_pipe.date_lib_build_begin|display_none:'未开始' }}
+                    {{ sample_pipe.lib_build_step.begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample_pipe.date_lib_build_end|display_none:'未结束' }}
+                    {{ sample_pipe.lib_build_step.end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample_pipe.operator_lib_build|display_none:'无' }}
+                    {{ sample_pipe.lib_build_step.operator|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -115,13 +115,13 @@
                     上机
                 </th>
                 <td>
-                    {{ sample_pipe.date_sequencing_begin|display_none:'未开始' }}
+                    {{ sample_pipe.sequencing_step.begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample_pipe.date_sequencing_end|display_none:'未结束' }}
+                    {{ sample_pipe.sequencing_step.end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample_pipe.operator_sequencing|display_none:'无' }}
+                    {{ sample_pipe.sequencing_step.operator|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -129,13 +129,13 @@
                     生物信息分析
                 </th>
                 <td>
-                    {{ sample_pipe.date_bioinfo_begin|display_none:'未开始' }}
+                    {{ sample_pipe.bioinfo_step.begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample_pipe.date_bioinfo_end|display_none:'未结束' }}
+                    {{ sample_pipe.bioinfo_step.end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample_pipe.operator_bioinfo|display_none:'无' }}
+                    {{ sample_pipe.bioinfo_step.operator|display_none:'无' }}
                 </td>
             </tr>
             <tr>
@@ -143,13 +143,13 @@
                     报告撰写
                 </th>
                 <td>
-                    {{ sample_pipe.date_report_begin|display_none:'未开始' }}
+                    {{ sample_pipe.report_step.begin|display_none:'未开始' }}
                 </td>
                 <td>
-                    {{ sample_pipe.date_report_end|display_none:'未结束' }}
+                    {{ sample_pipe.report_step.end|display_none:'未结束' }}
                 </td>
                 <td>
-                    {{ sample_pipe.operator_report|display_none:'无' }}
+                    {{ sample_pipe.report_step.operator|display_none:'无' }}
                 </td>
             </tr>
             </tbody>

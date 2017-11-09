@@ -67,9 +67,6 @@ class SampleInfo(models.Model):
     hospital = models.TextField(blank=True, null=True)
     subject = models.ForeignKey(SubjectInfo, blank=True, null=True)
 
-    index1_seq = models.CharField(max_length=20, blank=True, null=True)
-    index2_seq = models.CharField(max_length=20, blank=True, null=True)
-
     date_sampling = models.DateTimeField(blank=True, null=True)
     date_receive = models.DateTimeField(blank=True, null=True)
     date_deadline = models.DateTimeField(blank=True, null=True)
@@ -81,7 +78,70 @@ class SampleInfo(models.Model):
         ordering = ['-date_receive']
 
     def __str__(self):
-        return self.name
+        return f'{self.barcode}({self.name})'
+
+
+class DNAExtractStep(models.Model):
+    STATUS = 'DNA_extracted'
+
+    begin = models.DateTimeField(blank=True, null=True)
+    end = models.DateTimeField(blank=True, null=True)
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+
+class LibBuildStep(models.Model):
+    STATUS = 'lib_build'
+
+    begin = models.DateTimeField(blank=True, null=True)
+    end = models.DateTimeField(blank=True, null=True)
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+
+class SequencingStep(models.Model):
+    STATUS = 'seq'
+
+    begin = models.DateTimeField(blank=True, null=True)
+    end = models.DateTimeField(blank=True, null=True)
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract')
+
+    index1_seq = models.CharField(max_length=20, blank=True, null=True)
+    index2_seq = models.CharField(max_length=20, blank=True, null=True)
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+
+class BioInfoStep(models.Model):
+    STATUS = 'bioinfo'
+
+    begin = models.DateTimeField(blank=True, null=True)
+    end = models.DateTimeField(blank=True, null=True)
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+
+class ReportStep(models.Model):
+    STATUS = 'report'
+
+    begin = models.DateTimeField(blank=True, null=True)
+    end = models.DateTimeField(blank=True, null=True)
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
 
 
 class SamplePipe(models.Model):
@@ -97,27 +157,12 @@ class SamplePipe(models.Model):
 
     status = models.CharField(max_length=30, choices=STATUS, default='sample_received')
 
-    date_dna_extract_begin = models.DateTimeField(blank=True, null=True)
-    date_dna_extract_end = models.DateTimeField(blank=True, null=True)
-    operator_dna_extract = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                             related_name='%(app_label)s_%(class)s_dna_extract')
+    dna_extract_step = models.ForeignKey(DNAExtractStep, blank=True, null=True)
 
-    date_lib_build_begin = models.DateTimeField(blank=True, null=True)
-    date_lib_build_end = models.DateTimeField(blank=True, null=True)
-    operator_lib_build = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                           related_name='%(app_label)s_%(class)s_lib_build')
+    lib_build_step = models.ForeignKey(LibBuildStep, blank=True, null=True)
 
-    date_sequencing_begin = models.DateTimeField(blank=True, null=True)
-    date_sequencing_end = models.DateTimeField(blank=True, null=True)
-    operator_sequencing = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                            related_name='%(app_label)s_%(class)s_sequencing')
+    sequencing_step = models.ForeignKey(SequencingStep, blank=True, null=True)
 
-    date_bioinfo_begin = models.DateTimeField(blank=True, null=True)
-    date_bioinfo_end = models.DateTimeField(blank=True, null=True)
-    operator_bioinfo = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                         related_name='%(app_label)s_%(class)s_bioinfo')
+    bioinfo_step = models.ForeignKey(BioInfoStep, blank=True, null=True)
 
-    date_report_begin = models.DateTimeField(blank=True, null=True)
-    date_report_end = models.DateTimeField(blank=True, null=True)
-    operator_report = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                        related_name='%(app_label)s_%(class)s_report')
+    report_step = models.ForeignKey(ReportStep, blank=True, null=True)

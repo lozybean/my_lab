@@ -1,7 +1,8 @@
+from annoying.functions import get_object_or_None
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.utils.html import escape
-from sample_manage.form import LoginForm, SampleInfoForm
+from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, UserProfile, SamplePipe
 
 
@@ -58,7 +59,7 @@ def get_auth_user(request):
 def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
     auth_user = get_auth_user(request)
-    sample_pipe = SamplePipe.objects.filter(sample=sample, latest=True)
+    sample_pipe = get_object_or_None(SamplePipe, sample=sample, latest=True)
     return render(request, 'sample_info.html', {'sample': sample, 'is_auth': auth_user,
                                                 'sample_pipe': sample_pipe})
 
@@ -66,6 +67,8 @@ def sample_info(request, sample_id):
 def sample_list(request):
     samples = get_list_or_404(SampleInfo)
     auth_user = get_auth_user(request)
+    sample_pipes = [get_object_or_None(SamplePipe, sample=sample, latest=True) for sample in samples]
+    samples = zip(samples, sample_pipes)
     return render(request, 'sample_list.html', {'sample_list': samples, 'is_auth': auth_user})
 
 
@@ -88,7 +91,7 @@ def sample_input(request):
     auth_user = get_auth_user(request)
     if request.method == 'GET':
         form = SampleInfoForm()
-        return render(request, 'input_sample.html', {'form': form, 'is_auth': auth_user})
+        return render(request, 'form_input.html', {'form': form, 'is_auth': auth_user})
     else:
         form = SampleInfoForm(request.POST)
         if form.is_valid():
@@ -96,4 +99,18 @@ def sample_input(request):
             return redirect(message, message_text=escape('样本登记成功！'))
 
         else:
-            return render(request, 'input_sample.html', {'form': form, 'is_auth': auth_user})
+            return render(request, 'form_input.html', {'form': form, 'is_auth': auth_user})
+
+
+def subject_input(request):
+    auth_user = get_auth_user(request)
+    if request.method == 'GET':
+        form = SubjectInfoForm()
+        return render(request, 'form_input.html', {'form': form, 'is_auth': auth_user})
+    else:
+        form = SubjectInfoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(message, message_text=escape('受检者登记成功！'))
+        else:
+            return render(request, 'form_input.html', {'form': form, 'is_auth': auth_user})
