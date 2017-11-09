@@ -25,7 +25,7 @@
                     {{ sample.subject.name }}
                 </a></td>
                 <th>样本状态：</th>
-                <td>{{ sample.get_status_display }}</td>
+                <td>{{ sample_pipe.get_status_display }}</td>
             </tr>
             <tr>
                 <th>所做项目：</th>
@@ -53,38 +53,9 @@
                 <th>INDEX2</th>
                 <td>{{ sample.index2_seq|display_none:'无' }}</td>
             </tr>
-            {#            <tr>#}
-            {#            </tr>#}
-            {#            <tr>#}
-            {#                <td class="col-md-3">收样时间：</td>#}
-            {#                <td> {{ sample.date_receive|date_format|display_none:'未记录' }}</td>#}
-            {#            </tr>#}
-            {#            <tr>#}
-            {#                <td class="col-md-3">采样时间:</td>#}
-            {#                <td>{{ sample.date_sampling|date_format|display_none:'未记录' }}</td>#}
-            {#            </tr>#}
-            {#            <tr>#}
-            {#                <td class="col-md-3">受检者姓名：</td>#}
-            {#                <td><a href="{% url 'subject_info' subject_id=sample.subject.id %}">#}
-            {#                    {{ sample.subject.name }}</a></td>#}
-            {#            </tr>#}
         </table>
     </div>
 
-    {#    <form class="form-inline">#}
-    {##}
-    {#        <div class="form-group row">#}
-    {#            <label for="sample_status">样本状态：</label>#}
-    {#            <select class="form-control" id="sample_status">#}
-    {#                <option>{{ sample.get_status_display }}</option>#}
-    {#                {% for status in sample.STATUS %}#}
-    {#                    {% if status.0 != sample.status %}#}
-    {#                        <option value="{{ status.0 }}">{{ status.1 }}</option>#}
-    {#                    {% endif %}#}
-    {#                {% endfor %}#}
-    {#            </select>#}
-    {#        </div>#}
-    {#    </form>#}
     <div class="panel panel-default">
         <div class="panel-heading text-center">各步骤进度及时间
             （目前样本状态：<b>{{ sample_pipe.get_status_display }}</b>）

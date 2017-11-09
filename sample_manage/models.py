@@ -57,7 +57,7 @@ class SampleType(models.Model):
 
 class SampleInfo(models.Model):
     name = models.CharField(max_length=20)
-    barcode = models.CharField(max_length=50)
+    barcode = models.CharField(max_length=50, unique=True)
 
     type = models.ForeignKey(SampleType, blank=True, null=True)
     quantity = models.CharField(max_length=50, blank=True, null=True)

@@ -7,9 +7,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>my lab</title>
+    <script src="{% bootstrap_jquery_url %}"></script>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <script src="{% bootstrap_jquery_url %}"></script>
     <link rel="stylesheet" href="{% static 'css/lab.css' %}">
     {% if form %}
         {{ form.media }}
@@ -17,11 +17,11 @@
 </head>
 
 <body>
+{% include 'navbar.html' %}
 <div id="body" class="row">
 
-    <div class="content col-md-6 col-md-offset-3">
-        {% include 'navbar.html' %}
-    </div>
+    {#    <div class="content col-md-6 col-md-offset-3">#}
+    {#    </div>#}
     <br>
     <br>
     <div class="content col-md-6 col-md-offset-3">

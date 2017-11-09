@@ -1,5 +1,6 @@
+from datetimewidget.widgets import DateTimeWidget
 from django import forms
-from sample_manage.models import SampleInfo, SampleType, Project
+from sample_manage.models import SampleInfo, SampleType, Project, SubjectInfo
 
 
 class LoginForm(forms.Form):
@@ -46,7 +47,8 @@ class SampleInfoForm(forms.ModelForm):
     barcode = forms.CharField(
         required=True,
         label='样本条码',
-        error_messages={'required': '必须输入条码号'},
+        error_messages={'required': '必须输入样本条码',
+                        'unique': '该样本条码已经存在，请核对或者修改已有样本'},
         widget=forms.TextInput(
             attrs={
                 'placeholder': '请输入样本条码号',
@@ -72,8 +74,33 @@ class SampleInfoForm(forms.ModelForm):
             }
         )
     )
+    subject = forms.ModelChoiceField(
+        label='受检者',
+        queryset=SubjectInfo.objects,
+    )
+    date_sampling = forms.DateTimeField(
+        label='采样时间',
+        widget=DateTimeWidget(
+            usel10n=True,
+            bootstrap_version=3,
+        )
+    )
+    date_receive = forms.DateTimeField(
+        label='样本接收时间',
+        widget=DateTimeWidget(
+            usel10n=True,
+            bootstrap_version=3,
+        )
+    )
+    date_deadline = forms.DateTimeField(
+        label='报告截止时间',
+        widget=DateTimeWidget(
+            usel10n=True,
+            bootstrap_version=3,
+        )
+    )
 
     class Meta:
         model = SampleInfo
         fields = ['name', 'barcode', 'type', 'quantity', 'project',
-                  'hospital', 'subject']
+                  'hospital', 'subject', 'date_receive', 'date_sampling', 'date_deadline']

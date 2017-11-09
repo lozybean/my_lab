@@ -1,5 +1,6 @@
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
+from django.utils.html import escape
 from sample_manage.form import LoginForm, SampleInfoForm
 from sample_manage.models import SampleInfo, SubjectInfo, UserProfile, SamplePipe
 
@@ -30,6 +31,11 @@ def logout(request):
     if request.user.is_authenticated():
         auth.logout(request)
     return redirect(login)
+
+
+def message(request, message_text):
+    user = get_auth_user(request)
+    return render(request, 'message.html', {'message': message_text, 'is_auth': user})
 
 
 def user_info(request):
@@ -86,8 +92,8 @@ def sample_input(request):
     else:
         form = SampleInfoForm(request.POST)
         if form.is_valid():
-            sample_name = request.POST.get('sample_name', '')
-            sample_barcode = request.POST.get('sample_barcode', '')
-            return render(request, 'input_sample.html', {'form': form, 'is_auth': auth_user})
+            form.save()
+            return redirect(message, message_text=escape('样本登记成功！'))
+
         else:
             return render(request, 'input_sample.html', {'form': form, 'is_auth': auth_user})
