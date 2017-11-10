@@ -25,22 +25,22 @@
                 <table class="table table-responsive">
                     <thead class="thead-default">
                     <tr>
-                        <th width="15%" class="text-center">
+                        <th width="15%">
                             样本名称
                         </th>
-                        <th width="15%" class="text-center">
+                        <th width="15%">
                             样本条码
                         </th>
-                        <th width="25%" class="text-center">
+                        <th width="25%">
                             所做项目
                         </th>
-                        <th width="15%" class="text-center">
+                        <th width="15%">
                             受检者姓名
                         </th>
-                        <th width="20%" class="text-center">
+                        <th width="20%">
                             截止时间
                         </th>
-                        <th width="10%" class="text-center">
+                        <th width="10%">
                             操作
                         </th>
                     </tr>
@@ -85,6 +85,7 @@
                     <a href="#"><input type="button" value="退回" class="btn btn-danger"></a>
                 </p>
             {% endif %}
+        <input type="text" name="set_pipe_info" value=0 title hidden>
     </form>
 
 {% endblock %}

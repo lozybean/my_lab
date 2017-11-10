@@ -3,6 +3,7 @@ from sample_manage import views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
+    url(r'^message/(?P<message_text>[\w《》，。？：！…—]+)/$', views.message, name='message'),
     url(r'^sample_list/$', views.sample_list, name='sample_list'),
     url(r'^sample_list/status/(?P<status>\w+)/$', views.query_sample_by_status, name='query_sample_by_status'),
     url(r'^sample_list/date/(?P<step>\w+)/(?P<status>\w+)?/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$',
@@ -17,7 +18,9 @@ urlpatterns = [
     url(r'^user_info/$', views.user_info, name='user_info'),
     url(r'^sample_input/(?P<sample_id>\d+)?$', views.sample_input, name='sample_input'),
     url(r'^sample_pipe/(?P<step_name>\w+)/(?P<status>\w+)/$', views.sample_pipe_list, name='sample_pipe'),
+
+    url(r'^sequencing_step_info/(?P<sample_id>\d+)?$', views.sequencing_step_info, name='sequencing_step_info'),
+
     url(r'^task/(?P<primary_task>\w+)/(?P<status>\w+)/$', views.task, name='task'),
     url(r'^subject_input/(?P<subject_id>\d+)?$', views.subject_input, name='subject_input'),
-    url(r'^message/(?P<message_text>[\w《》，。？：！…—]+)/$', views.message, name='message')
 ]

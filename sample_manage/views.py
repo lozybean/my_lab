@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, get_list_or_404, redirec
 from django.utils.html import escape
 from sample_manage import models
 from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm)
-from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType
+from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType, SequencingStep
 from sample_manage.utils import get_auth_user, get_user_profile, check_permission, get_primary_task
 
 
@@ -62,6 +62,7 @@ def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
     projects = Project.objects.all()
     sample_types = SampleType.objects.all()
+    print(sample.sample_pipe.sequencing_step.index1_seq)
     return render(request, 'sample_info.html', {'sample': sample, 'projects': projects,
                                                 'sample_types': sample_types})
 
@@ -142,7 +143,7 @@ def sample_input(request, sample_id=None):
         form = SampleInfoForm(request.POST)
         if form.is_valid():
             sample_pipe = SamplePipe()
-            sample_pipe.status = 'sample_received'
+            sample_pipe.status = 'sample_receive'
             sample_pipe.save()
             sample = form.instance
             sample.sample_pipe = sample_pipe
@@ -273,6 +274,57 @@ def finish_sample_pipe(request, step_name):
     return get_sample_pipe_tasks(request, step_name)
 
 
+def get_index_seq(request, sample_id_list):
+    samples = SampleInfo.objects.filter(id__in=sample_id_list)
+    return render(request, 'input_index_seq.html', {'sample_list': samples})
+
+
+def set_index_seq(request):
+    auth_user = get_auth_user(request)
+    index1_list = request.POST.getlist('index1_list')
+    index2_list = request.POST.getlist('index2_list')
+    current_time = datetime.datetime.now()
+    sample_id_list = request.POST.getlist('sample_list')
+    for ind, sample_id in enumerate(sample_id_list):
+        sample = get_object_or_None(SampleInfo, id=sample_id)
+        if sample is None:
+            continue
+        sample_pipe = sample.sample_pipe
+        # 保存index序列
+        sequencing = SequencingStep()
+        sequencing.index1_seq = index1_list[ind]
+        sequencing.index2_seq = index2_list[ind]
+        sequencing.operator = auth_user
+        sequencing.begin = current_time
+        sequencing.save()
+        # 修改流程状态
+        sample_pipe.sequencing_step = sequencing
+        sample_pipe.status = 'sequencing'
+        sample_pipe.save()
+        # 修改样本状态
+        sample.sample_pipe = sample_pipe
+        sample.save()
+    # 重定向到新的任务
+    return get_sample_pipe(request, 'sequencing', 'end')
+
+
+def sequencing_step_info(request, sample_id=None):
+    if not check_permission(request, 'sequencing'):
+        return redirect(message, message_text='你没有权限进行该操作')
+    if request.method == 'GET':
+        if sample_id is None:
+            return redirect(home)
+        else:
+            return get_index_seq(request, [sample_id])
+    else:
+        set_pipe_info = request.POST.get('set_pipe_info', True)
+        if set_pipe_info == '0' or set_pipe_info == 0:
+            sample_id_list = request.POST.getlist('sample_list')
+            return get_index_seq(request, sample_id_list)
+        else:
+            return set_index_seq(request)
+
+
 def get_sample_pipe(request, step_name, status):
     if status == 'begin':
         return get_sample_pipe_tasks(request, step_name)
@@ -284,7 +336,10 @@ def get_sample_pipe(request, step_name, status):
 
 def set_sample_pipe(request, step_name, status):
     if status == 'begin':
-        return start_sample_pipe(request, step_name)
+        if step_name == 'sequencing':
+            return sequencing_step_info(request)
+        else:
+            return start_sample_pipe(request, step_name)
     elif status == 'end':
         return finish_sample_pipe(request, step_name)
     else:

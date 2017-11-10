@@ -6,7 +6,7 @@
     font-size: 25px;
 }
 
-td input {
+td input[type=text] {
     text-align: center;
     display: block;
     padding: 0;

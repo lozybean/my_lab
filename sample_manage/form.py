@@ -102,11 +102,20 @@ class SampleInfoForm(forms.ModelForm):
             bootstrap_version=3,
         )
     )
+    has_request_note = forms.BooleanField(
+        label='是否有检测申请单',
+        initial=True,
+    )
+    has_informed_note = forms.BooleanField(
+        label='是否有知情同意书',
+        initial=True,
+    )
 
     class Meta:
         model = SampleInfo
         fields = ['name', 'barcode', 'type', 'quantity', 'project',
-                  'hospital', 'subject', 'date_receive', 'date_sampling', 'date_deadline']
+                  'hospital', 'subject', 'date_receive', 'date_sampling', 'date_deadline',
+                  'has_request_note', 'has_informed_note']
 
 
 class SubjectInfoForm(forms.ModelForm):
