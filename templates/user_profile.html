@@ -41,9 +41,15 @@
         <ul>
             {% for permission in  user_profile.PERMISSIONS %}
                 {% if user_profile|get_attr:permission.0 %}
-                    <li class="list-inline list-group-item-success">{{ permission.1 }}</li>
+                    <li class="list-inline list-group-item-success">
+                        {{ permission.1 }}
+                        <span class="glyphicon glyphicon-ok"></span>
+                    </li>
                 {% else %}
-                    <li class="list-inline list-group-item-danger">{{ permission.1 }}</li>
+                    <li class="list-inline list-group-item-danger">
+                        {{ permission.1 }}
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </li>
                 {% endif %}
             {% endfor %}
         </ul>

@@ -13,9 +13,7 @@
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
-{#                    {% if field.type == 'text' %}#}
-                        {% bootstrap_field field field_class='col-md-8' label_class='col-md-2' %}
-{#                    {% endif %}#}
+                    {% bootstrap_field field field_class='col-md-8' label_class='col-md-2' %}
                 </div>
             {% endfor %}
             <p class="form-actions">

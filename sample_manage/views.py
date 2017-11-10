@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404, get_list_or_404, redirec
 from django.utils.html import escape
 from sample_manage import models
 from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm)
-from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe
+from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType
 from sample_manage.utils import get_auth_user, get_user_profile, check_permission, get_primary_task
 
 
@@ -60,7 +60,10 @@ def user_info(request):
 
 def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
-    return render(request, 'sample_info.html', {'sample': sample})
+    projects = Project.objects.all()
+    sample_types = SampleType.objects.all()
+    return render(request, 'sample_info.html', {'sample': sample, 'projects': projects,
+                                                'sample_types': sample_types})
 
 
 def sample_list(request):

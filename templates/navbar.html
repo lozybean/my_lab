@@ -34,15 +34,10 @@
                     <li><a href="{% url 'sample_pipe' step_name='lib_build' status='end' %}">文库构建中样本</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='sequencing' status='begin' %}">上机测序任务</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='sequencing' status='end' %}">上机测序中样本</a></li>
-                    <li><a href="{% url 'sample_pipe' step_name='bioinfo'  status='begin' %}">生物信息任务</a></li>
-                    <li><a href="{% url 'sample_pipe' step_name='bioinfo'  status='end' %}">生物信息分析中样本</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='bioinfo' status='begin' %}">生物信息任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='bioinfo' status='end' %}">生物信息分析中样本</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='report' status='begin' %}">报告撰写任务</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='report' status='end' %}">报告撰写中样本</a></li>
-                    {#                    <li><a href="#">新项目录入</a></li>#}
-                    {#                        <li role="separator" class="divider"></li>#}
-                    {#                        <li><a href="#">Separated link</a></li>#}
-                    {#                        <li role="separator" class="divider"></li>#}
-                    {#                        <li><a href="#">One more separated link</a></li>#}
                 </ul>
             </li>
         </ul>
@@ -51,7 +46,7 @@
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="搜索样本条码" name="barcode">
             </div>
-            <button type="submit" class="btn btn-default">Submit</button>
+            <button type="submit" class="btn btn-default">搜索</button>
         </form>
         <ul class="nav navbar-right navbar-nav">
             {% if user.is_authenticated %}
