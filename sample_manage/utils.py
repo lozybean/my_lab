@@ -17,5 +17,15 @@ def get_user_profile(request):
     return UserProfile.objects.filter(user=user).first()
 
 
-def check_permission(user, operation):
-    return getattr(user, operation)
+def check_permission(request, operation):
+    user_profile = get_user_profile(request)
+    if not user_profile:
+        return False
+    return getattr(user_profile, operation)
+
+
+def get_primary_task(request):
+    user_profile = get_user_profile(request)
+    if not user_profile:
+        return None
+    return user_profile.primary_task

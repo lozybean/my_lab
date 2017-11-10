@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% load display_none %}
 {% load date_format %}
+{% load set_var %}
+{% load get_attr %}
 {% block content %}
+    {% set user_profile = user.userprofile %}
     <div class="panel panel-default">
 
         <div class="panel-heading text-center">我的信息</div>
@@ -24,6 +27,25 @@
                 <th>邮件：</th>
                 <td>{{ user.email }}</td>
             </tr>
+            <tr>
+                <th>主要任务：</th>
+                <td>{{ user_profile.get_primary_task_display }}</td>
+                <th></th>
+                <td></td>
+            </tr>
         </table>
+    </div>
+    <div class="panel panel-default">
+
+        <div class="panel-heading text-center">权限列表</div>
+        <ul>
+            {% for permission in  user_profile.PERMISSIONS %}
+                {% if user_profile|get_attr:permission.0 %}
+                    <li class="list-inline list-group-item-success">{{ permission.1 }}</li>
+                {% else %}
+                    <li class="list-inline list-group-item-danger">{{ permission.1 }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </div>
 {% endblock %}

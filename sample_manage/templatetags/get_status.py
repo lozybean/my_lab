@@ -10,6 +10,5 @@ def get_status(step_name):
         step_name = step_name[:-5]
     for status in SamplePipe.STATUS:
         if status[0] == step_name:
-            print(status[1])
             return status[1]
     return '未知'

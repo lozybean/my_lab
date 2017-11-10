@@ -2,12 +2,27 @@ from django.conf import settings
 from django.contrib.auth.models import User, AbstractUser
 from django.db import models
 
-
 # Create your models here.
 
+STATUS = (('sample_receive', '样本接收'),
+          ('dna_extract', 'DNA提取'),
+          ('lib_build', '文库构建'),
+          ('sequencing', '上机测序'),
+          ('bioinfo', '生信分析'),
+          ('report', '报告撰写'),
+          ('finish', '完成检测'),)
+
+
 class UserProfile(models.Model):
+    TASK_NAMES = STATUS[:-1]
+    PERMISSIONS = [('subject_input', '受检者输入'),
+                   ('subject_view', '患者信息查看'),
+                   ] + list(TASK_NAMES)
     user = models.OneToOneField(User)
 
+    primary_task = models.CharField(blank=True, max_length=30, choices=TASK_NAMES)
+
+    # permissions:
     subject_input = models.BooleanField(default=False)
     subject_view = models.BooleanField(default=False)
 
@@ -118,13 +133,7 @@ class ReportStep(models.Model):
 
 
 class SamplePipe(models.Model):
-    STATUS = (('sample_received', '收样'),
-              ('dna_extract', 'DNA提取'),
-              ('lib_build', '文库构建'),
-              ('sequencing', '上机测序'),
-              ('bioinfo', '生信分析'),
-              ('report', '报告撰写'),
-              ('finish', '完成检测'),)
+    STATUS = STATUS
 
     # 实际操作的步骤
     STEPS = [f'{i[0]}_step' for i in STATUS][1:-1]
