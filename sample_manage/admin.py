@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from sample_manage.models import (SampleInfo, SubjectInfo, Project, FamilyInfo,
                                   UserProfile, SampleType, SamplePipe,
-                                  DNAExtractStep, LibBuildStep, BioInfoStep, ReportStep)
+                                  DnaExtractStep, LibBuildStep, BioinfoStep, ReportStep)
 
 
 # Register your models here.
@@ -27,8 +27,8 @@ admin.site.register(SubjectInfo)
 admin.site.register(Project)
 admin.site.register(FamilyInfo)
 
-admin.site.register(DNAExtractStep)
+admin.site.register(DnaExtractStep)
 admin.site.register(LibBuildStep)
-admin.site.register(BioInfoStep)
+admin.site.register(BioinfoStep)
 admin.site.register(ReportStep)
 admin.site.register(SamplePipe)

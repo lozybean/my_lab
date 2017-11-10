@@ -112,7 +112,7 @@
                 {% with sample_pipe|get_attr:step_name as step %}
                     <tr>
                         <th>
-                            {{ sample_pipe|get_status:step_name }}
+                            {{ step_name|get_status }}
                         </th>
                         <td>
                             {% if step.begin %}

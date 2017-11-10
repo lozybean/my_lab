@@ -61,7 +61,7 @@ class SampleType(models.Model):
         return self.type
 
 
-class DNAExtractStep(models.Model):
+class DnaExtractStep(models.Model):
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
@@ -94,7 +94,7 @@ class SequencingStep(models.Model):
         return f'操作人: {self.operator}'
 
 
-class BioInfoStep(models.Model):
+class BioinfoStep(models.Model):
     begin = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
@@ -128,13 +128,13 @@ class SamplePipe(models.Model):
 
     status = models.CharField(max_length=30, choices=STATUS)
 
-    dna_extract_step = models.ForeignKey(DNAExtractStep, blank=True, null=True)
+    dna_extract_step = models.ForeignKey(DnaExtractStep, blank=True, null=True)
 
     lib_build_step = models.ForeignKey(LibBuildStep, blank=True, null=True)
 
     sequencing_step = models.ForeignKey(SequencingStep, blank=True, null=True)
 
-    bioinfo_step = models.ForeignKey(BioInfoStep, blank=True, null=True)
+    bioinfo_step = models.ForeignKey(BioinfoStep, blank=True, null=True)
 
     report_step = models.ForeignKey(ReportStep, blank=True, null=True)
 

@@ -18,11 +18,16 @@
                 <ul class="dropdown-menu">
                     <li><a href="{% url 'sample_input' %}">样本录入</a></li>
                     <li><a href="{% url 'subject_input' %}">受检者信息录入</a></li>
-                    <li><a href="{% url 'sample_pipe' step_name='dna_extract' %}">DNA提取任务</a></li>
-                    <li><a href="{% url 'sample_pipe' step_name='lib_build' %}">文库构建任务</a></li>
-                    <li><a href="{% url 'sample_pipe' step_name='sequencing' %}">上机测序任务</a></li>
-                    <li><a href="{% url 'sample_pipe' step_name='bioinfo' %}">生物信息任务</a></li>
-                    <li><a href="{% url 'sample_pipe' step_name='report' %}">报告撰写任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='dna_extract' status='begin' %}">DNA提取任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='dna_extract' status='end' %}">DNA提取中样本</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='lib_build' status='begin' %}">文库构建任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='lib_build' status='end' %}">文库构建中样本</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='sequencing' status='begin' %}">上机测序任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='sequencing' status='end' %}">上机测序中样本</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='bioinfo'  status='begin' %}">生物信息任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='bioinfo'  status='end' %}">生物信息分析中样本</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='report' status='begin' %}">报告撰写任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='report' status='end' %}">报告撰写中样本</a></li>
                     {#                    <li><a href="#">新项目录入</a></li>#}
                     {#                        <li role="separator" class="divider"></li>#}
                     {#                        <li><a href="#">Separated link</a></li>#}

@@ -1,7 +1,9 @@
 #body {
     width: 100%;
 }
-
+#sample_pipe_title{
+    font-size: 25px;
+}
 table#sample_info_table {
 
 }
