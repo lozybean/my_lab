@@ -1,3 +1,5 @@
+import datetime
+
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
 from sample_manage.models import (SampleInfo, SampleType, Project, SubjectInfo,
@@ -86,6 +88,7 @@ class SampleInfoForm(forms.ModelForm):
         )
     )
     date_receive = forms.DateTimeField(
+        initial=datetime.datetime.now(),
         label='样本接收时间',
         widget=DateTimeWidget(
             usel10n=True,

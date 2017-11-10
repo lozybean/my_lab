@@ -6,7 +6,7 @@ from django.utils.html import escape
 from sample_manage import models
 from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, UserProfile, SamplePipe
-from sample_manage.utils import get_auth_user
+from sample_manage.utils import get_auth_user, get_user_profile, check_permission
 
 
 # Create your views here.
@@ -91,13 +91,17 @@ def query_sample_by_date(request, step, year, month, day, status=None):
 
 
 def subject_info(request, subject_id):
+    user_profile = get_user_profile(request)
+    auth_user = user_profile.user
+    if not check_permission(user_profile, 'subject_view'):
+        return redirect(message, message_text='你没有权限进行该操作')
     subject = get_object_or_404(SubjectInfo, id=subject_id)
+
     samples = SampleInfo.objects.filter(subject=subject)
     if subject.family:
         family = SubjectInfo.objects.filter(family=subject.family)
     else:
         family = None
-    auth_user = get_auth_user(request)
     return render(request, 'subject_info.html', {'subject': subject, 'is_auth': auth_user,
                                                  'sample_list': samples, 'family': family})
 
@@ -109,7 +113,10 @@ def subject_list(request):
 
 
 def sample_input(request):
-    auth_user = get_auth_user(request)
+    user_profile = get_user_profile(request)
+    auth_user = user_profile.user
+    if not check_permission(user_profile, 'sample_receive'):
+        return redirect(message, message_text='你没有权限进行该操作')
     if request.method == 'GET':
         form = SampleInfoForm()
         return render(request, 'form_input.html', {'form': form, 'is_auth': auth_user})
@@ -129,7 +136,10 @@ def sample_input(request):
 
 
 def subject_input(request):
-    auth_user = get_auth_user(request)
+    user_profile = get_user_profile(request)
+    auth_user = user_profile.user
+    if not check_permission(user_profile, 'subject_input'):
+        return redirect(message, message_text='你没有权限进行该操作')
     if request.method == 'GET':
         form = SubjectInfoForm()
         return render(request, 'form_input.html', {'form': form, 'is_auth': auth_user})
@@ -166,7 +176,9 @@ def get_sample_pipe_tasks(request, step_name):
         return render(request, 'sample_pipe.html', {'sample_list': samples, 'is_auth': auth_user,
                                                     'step_name': step_name, 'status': 'begin'})
     else:
-        return redirect(message, message_text='没有相关任务！')
+        return render(request, 'sample_pipe.html', {'sample_list': samples, 'is_auth': auth_user,
+                                                    'step_name': step_name, 'status': 'begin',
+                                                    'message': '没有相关任务'})
 
 
 def get_sample_pipe_processing(request, step_name):
@@ -181,7 +193,10 @@ def get_sample_pipe_processing(request, step_name):
         return render(request, 'sample_pipe.html', {'sample_list': samples, 'is_auth': auth_user,
                                                     'step_name': step_name, 'status': 'end'})
     else:
-        return redirect(message, message_text='没有进行中的样本！')
+        # return redirect(message, message_text='没有进行中的样本！')
+        return render(request, 'sample_pipe.html', {'sample_list': samples, 'is_auth': auth_user,
+                                                    'step_name': step_name, 'status': 'end',
+                                                    'message': '没有进行中的样本'})
 
 
 def start_sample_pipe(request, step_name):
@@ -217,7 +232,6 @@ def start_sample_pipe(request, step_name):
 def finish_sample_pipe(request, step_name):
     auth_user = get_auth_user(request)
     previous_step_name, current_step_name = get_step_names(step_name)
-
     current_time = datetime.datetime.now()
     sample_id_list = request.POST.getlist('sample_list')
     samples = SampleInfo.objects.filter(id__in=sample_id_list)
@@ -240,6 +254,9 @@ def finish_sample_pipe(request, step_name):
 
 
 def sample_pipe_list(request, step_name, status='begin'):
+    user_profile = get_user_profile(request)
+    if not check_permission(user_profile, step_name):
+        return redirect(message, message_text='你没有权限进行该操作')
     if request.method == 'GET':
         if status == 'begin':
             return get_sample_pipe_tasks(request, step_name)

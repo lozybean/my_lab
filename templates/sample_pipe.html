@@ -16,64 +16,71 @@
                     <b>{{ step_name|get_status }}</b>中样本
                 </div>
             {% endif %}
-            <table class="table table-responsive">
-                <thead class="thead-default">
-                <tr>
-                    <th width="15%" class="text-center">
-                        样本名称
-                    </th>
-                    <th width="15%" class="text-center">
-                        样本条码
-                    </th>
-                    <th width="25%" class="text-center">
-                        所做项目
-                    </th>
-                    <th width="15%" class="text-center">
-                        受检者姓名
-                    </th>
-                    <th width="20%" class="text-center">
-                        截止时间
-                    </th>
-                    <th width="10%" class="text-center">
-                        操作
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for sample in sample_list %}
-                    {% set sample_pipe = sample.sample_pipe %}
+            {% if message %}
+                <h4>
+                    {{ message }}
+                </h4>
+                </div>
+            {% else %}
+                <table class="table table-responsive">
+                    <thead class="thead-default">
                     <tr>
-                        <td>
-                            <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.name }}</a>
-                        </td>
-                        <td>
-                            <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.barcode }}</a>
-                        </td>
-                        <td>
-                            {{ sample.project.name }}
-                        </td>
-                        <td>
-                            <a href="{% url 'subject_info' subject_id=sample.subject.id %}">{{ sample.subject.name }}</a>
-                        </td>
-                        <td>
-                            {{ sample.date_deadline|date_format|display_none:'未记录' }}
-                        </td>
-                        <td>
-                            <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" value="{{ sample.id }}"
-                                       name="sample_list">
-                            </label>
-                        </td>
+                        <th width="15%" class="text-center">
+                            样本名称
+                        </th>
+                        <th width="15%" class="text-center">
+                            样本条码
+                        </th>
+                        <th width="25%" class="text-center">
+                            所做项目
+                        </th>
+                        <th width="15%" class="text-center">
+                            受检者姓名
+                        </th>
+                        <th width="20%" class="text-center">
+                            截止时间
+                        </th>
+                        <th width="10%" class="text-center">
+                            操作
+                        </th>
                     </tr>
-                {% endfor %}
-                </tbody>
+                    </thead>
+                    <tbody>
+                    {% for sample in sample_list %}
+                        {% set sample_pipe = sample.sample_pipe %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.name }}</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'sample_info' sample_id=sample.id %}">{{ sample.barcode }}</a>
+                            </td>
+                            <td>
+                                {{ sample.project.name }}
+                            </td>
+                            <td>
+                                <a href="{% url 'subject_info' subject_id=sample.subject.id %}">{{ sample.subject.name }}</a>
+                            </td>
+                            <td>
+                                {{ sample.date_deadline|date_format|display_none:'未记录' }}
+                            </td>
+                            <td>
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" value="{{ sample.id }}"
+                                           name="sample_list">
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
 
-            </table>
-        </div>
-        <p class="form-actions">
-            <input type="submit" value="确定" class="btn btn-primary">
-            <a href="#"><input type="button" value="退回" class="btn btn-danger"></a>
-        </p>
+                </table>
+                </div>
+                <p class="form-actions">
+                    <input type="submit" value="确定" class="btn btn-primary">
+                    <a href="#"><input type="button" value="退回" class="btn btn-danger"></a>
+                </p>
+            {% endif %}
     </form>
 
 {% endblock %}

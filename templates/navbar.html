@@ -16,8 +16,8 @@
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="{% url 'sample_input' %}">样本录入</a></li>
                     <li><a href="{% url 'subject_input' %}">受检者信息录入</a></li>
+                    <li><a href="{% url 'sample_input' %}">样本录入</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='dna_extract' status='begin' %}">DNA提取任务</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='dna_extract' status='end' %}">DNA提取中样本</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='lib_build' status='begin' %}">文库构建任务</a></li>

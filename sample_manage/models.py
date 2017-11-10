@@ -8,7 +8,10 @@ from django.db import models
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
 
-    sample_received = models.BooleanField(default=False)
+    subject_input = models.BooleanField(default=False)
+    subject_view = models.BooleanField(default=False)
+
+    sample_receive = models.BooleanField(default=False)
     dna_extract = models.BooleanField(default=False)
     lib_build = models.BooleanField(default=False)
     sequencing = models.BooleanField(default=False)
