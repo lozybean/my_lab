@@ -125,11 +125,18 @@ def subject_list(request):
     return render(request, 'subject_list.html', {'subject_list': subjects})
 
 
-def sample_input(request):
+def sample_input(request, sample_id=None):
     if not check_permission(request, 'sample_receive'):
         return redirect(message, message_text='你没有权限进行该操作')
     if request.method == 'GET':
-        form = SampleInfoForm()
+        if sample_id is None:
+            form = SampleInfoForm()
+        else:
+            sample = get_object_or_None(SampleInfo, id=sample_id)
+            if sample is None:
+                form = SampleInfoForm()
+            else:
+                form = SampleInfoForm(instance=sample)
         return render(request, 'form_input.html', {'form': form})
     else:
         form = SampleInfoForm(request.POST)
@@ -146,11 +153,18 @@ def sample_input(request):
             return render(request, 'form_input.html', {'form': form})
 
 
-def subject_input(request):
+def subject_input(request, subject_id=None):
     if not check_permission(request, 'subject_input'):
         return redirect(message, message_text='你没有权限进行该操作')
     if request.method == 'GET':
-        form = SubjectInfoForm()
+        if subject_id is None:
+            form = SubjectInfoForm()
+        else:
+            subject = get_object_or_None(SubjectInfo, id=subject_id)
+            if subject is None:
+                form = SubjectInfoForm()
+            else:
+                form = SubjectInfoForm(instance=subject)
         return render(request, 'form_input.html', {'form': form})
     else:
         form = SubjectInfoForm(request.POST)

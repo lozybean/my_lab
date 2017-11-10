@@ -44,14 +44,7 @@
                 <tr>
                     <th>所做项目：</th>
                     <td>
-                        <select name="project" id="id_project" required title class="form-control" {{ readonly }}>
-                            <option value="{{ sample.project.id }}" selected>{{ sample.project }}</option>
-                            {% for project in projects %}
-                                {% if project != sample.project %}
-                                    <option value="{{ project.id }}">{{ project }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+                        {{ sample.project }}
                     </td>
                     <th>送检医院：</th>
                     <td>
@@ -62,15 +55,7 @@
                 <tr>
                     <th>样本类型：</th>
                     <td>
-                        <select name="type" id="id_type" required title
-                                class="form-control" {{ readonly }}>
-                            <option value="{{ sample.type.id }}" selected>{{ sample.type }}</option>
-                            {% for type in sample_types %}
-                                {% if type != sample.type %}
-                                    <option value="{{ type.id }}">{{ type }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+                        {{ sample.type }}
                     </td>
                     <th>样本量</th>
                     <td>
@@ -111,6 +96,11 @@
             </table>
         </div>
     </form>
+    <p class="form-actions">
+        <a href="{% url 'sample_input' sample_id=sample.id %}">
+            <input type="button" value="修改样本信息" class="btn btn-danger">
+        </a>
+    </p>
     <div class="panel panel-default">
         <div class="panel-heading text-center">各步骤进度及时间
             （目前样本状态：<b>{{ sample_pipe.get_status_display }}</b>）

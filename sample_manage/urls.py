@@ -15,9 +15,9 @@ urlpatterns = [
     url(r'^login/$', views.login, name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^user_info/$', views.user_info, name='user_info'),
-    url(r'^sample_input/$', views.sample_input, name='sample_input'),
+    url(r'^sample_input/(?P<sample_id>\d+)?$', views.sample_input, name='sample_input'),
     url(r'^sample_pipe/(?P<step_name>\w+)/(?P<status>\w+)/$', views.sample_pipe_list, name='sample_pipe'),
     url(r'^task/(?P<primary_task>\w+)/(?P<status>\w+)/$', views.task, name='task'),
-    url(r'^subject_input/$', views.subject_input, name='subject_input'),
+    url(r'^subject_input/(?P<subject_id>\d+)?$', views.subject_input, name='subject_input'),
     url(r'^message/(?P<message_text>[\w《》，。？：！…—]+)/$', views.message, name='message')
 ]

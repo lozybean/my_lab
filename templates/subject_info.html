@@ -42,6 +42,11 @@
         </textarea>
         </div>
     </div>
+    <p class="form-actions">
+        <a href="{% url 'subject_input' subject_id=subject.id %}">
+            <input type="button" value="修改受检者信息" class="btn btn-danger">
+        </a>
+    </p>
     <div class="panel panel-default">
         <div class="panel-heading text-center">所有送检样本信息</div>
         <table class="table table-responsive">
