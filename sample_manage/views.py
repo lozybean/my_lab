@@ -62,7 +62,6 @@ def sample_info(request, sample_id):
     sample = get_object_or_404(SampleInfo, id=sample_id)
     projects = Project.objects.all()
     sample_types = SampleType.objects.all()
-    print(sample.sample_pipe.sequencing_step.index1_seq)
     return render(request, 'sample_info.html', {'sample': sample, 'projects': projects,
                                                 'sample_types': sample_types})
 
