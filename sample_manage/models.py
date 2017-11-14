@@ -15,16 +15,18 @@ STATUS = (('sample_receive', '样本接收'),
 
 class UserProfile(models.Model):
     TASK_NAMES = STATUS[:-1]
-    PERMISSIONS = [('subject_input', '受检者输入'),
-                   ('subject_view', '患者信息查看'),
+    PERMISSIONS = [('add_subject', '受检者输入'),
+                   ('view_subject', '患者信息查看'),
                    ] + list(TASK_NAMES)
     user = models.OneToOneField(User)
 
     primary_task = models.CharField(blank=True, max_length=30, choices=TASK_NAMES)
 
     # permissions:
-    subject_input = models.BooleanField(default=False)
-    subject_view = models.BooleanField(default=False)
+    add_subject = models.BooleanField(default=False)
+    view_subject = models.BooleanField(default=False)
+
+    add_sample_type = models.BooleanField(default=False)
 
     sample_receive = models.BooleanField(default=False)
     dna_extract = models.BooleanField(default=False)

@@ -16,11 +16,13 @@ urlpatterns = [
     url(r'^login/$', views.login, name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^user_info/$', views.user_info, name='user_info'),
-    url(r'^sample_input/(?P<sample_id>\d+)?$', views.sample_input, name='sample_input'),
     url(r'^sample_pipe/(?P<step_name>\w+)/(?P<status>\w+)/$', views.sample_pipe_list, name='sample_pipe'),
 
     url(r'^sequencing_step_info/(?P<sample_id>\d+)?$', views.sequencing_step_info, name='sequencing_step_info'),
 
     url(r'^task/(?P<primary_task>\w+)/(?P<status>\w+)/$', views.task, name='task'),
-    url(r'^subject_input/(?P<subject_id>\d+)?$', views.subject_input, name='subject_input'),
+
+    url(r'^add/sample_info/(?P<pk>\d+)?$', views.add_sample_info, name='add_sample_info'),
+    url(r'^add/subject_info/(?P<pk>\d+)?$', views.add_subject_info, name='add_subject_info'),
+    url(r'^add/sample_type/(?P<pk>\d+)?$', views.add_sample_type, name='add_sample_type'),
 ]

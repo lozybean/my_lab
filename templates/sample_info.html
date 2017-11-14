@@ -111,7 +111,7 @@
         </div>
     </form>
     <p class="form-actions">
-        <a href="{% url 'sample_input' sample_id=sample.id %}">
+        <a href="{% url 'add_sample_info' pk=sample.id %}">
             <input type="button" value="修改样本信息" class="btn btn-danger">
         </a>
         <a href="{% url 'sequencing_step_info' sample_id=sample.id %}">

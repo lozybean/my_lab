@@ -5,7 +5,7 @@ from django.contrib import auth
 from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.utils.html import escape
 from sample_manage import models
-from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm)
+from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType, SequencingStep
 from sample_manage.utils import get_auth_user, get_user_profile, check_permission, get_primary_task
 
@@ -96,10 +96,8 @@ def query_sample_by_date(request, step, year, month, day, status=None):
 
 
 def query_sample_by_barcode(request):
-    print(request.method)
     if request.method == 'POST':
         barcode = request.POST.get('barcode')
-        print(barcode)
         sample = get_object_or_None(SampleInfo, barcode=barcode)
         return redirect(sample_info, sample_id=sample.id)
     else:
@@ -107,7 +105,7 @@ def query_sample_by_barcode(request):
 
 
 def subject_info(request, subject_id):
-    if not check_permission(request, 'subject_view'):
+    if not check_permission(request, 'view_subject'):
         return redirect(message, message_text='你没有权限进行该操作')
     subject = get_object_or_404(SubjectInfo, id=subject_id)
 
@@ -125,14 +123,14 @@ def subject_list(request):
     return render(request, 'subject_list.html', {'subject_list': subjects})
 
 
-def sample_input(request, sample_id=None):
+def add_sample_info(request, pk=None):
     if not check_permission(request, 'sample_receive'):
         return redirect(message, message_text='你没有权限进行该操作')
     if request.method == 'GET':
-        if sample_id is None:
+        if pk is None:
             form = SampleInfoForm()
         else:
-            sample = get_object_or_None(SampleInfo, id=sample_id)
+            sample = get_object_or_None(SampleInfo, id=pk)
             if sample is None:
                 form = SampleInfoForm()
             else:
@@ -153,14 +151,14 @@ def sample_input(request, sample_id=None):
             return render(request, 'form_input.html', {'form': form})
 
 
-def subject_input(request, subject_id=None):
-    if not check_permission(request, 'subject_input'):
+def add_subject_info(request, pk=None):
+    if not check_permission(request, 'add_subject'):
         return redirect(message, message_text='你没有权限进行该操作')
     if request.method == 'GET':
-        if subject_id is None:
+        if pk is None:
             form = SubjectInfoForm()
         else:
-            subject = get_object_or_None(SubjectInfo, id=subject_id)
+            subject = get_object_or_None(SubjectInfo, id=pk)
             if subject is None:
                 form = SubjectInfoForm()
             else:
@@ -171,6 +169,28 @@ def subject_input(request, subject_id=None):
         if form.is_valid():
             form.save()
             return redirect(message, message_text=escape('受检者登记成功！'))
+        else:
+            return render(request, 'form_input.html', {'form': form})
+
+
+def add_sample_type(request, pk=None):
+    if not check_permission(request, 'add_sample_type'):
+        return redirect(message, message_text='你没有权限进行该操作')
+    if request.method == 'GET':
+        if pk is None:
+            form = SampleTypeForm()
+        else:
+            obj = get_object_or_None(SampleType, id=pk)
+            if obj is None:
+                form = SampleTypeForm()
+            else:
+                form = SampleTypeForm(instance=obj)
+        return render(request, 'form_input.html', {'form': form})
+    else:
+        form = SampleTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(message, message_text=escape('样本信息登记成功！'))
         else:
             return render(request, 'form_input.html', {'form': form})
 
@@ -356,7 +376,7 @@ def sample_pipe_list(request, step_name, status='begin'):
 
 def task(request, primary_task, status):
     if primary_task == 'sample_receive':
-        return redirect(subject_input)
+        return redirect(add_subject_info)
     if not primary_task:
         return message(request, '尚未设置主要任务')
     return sample_pipe_list(request, primary_task, status)
