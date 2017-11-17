@@ -10,7 +10,7 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import FormView
 from django_addanother.views import CreatePopupMixin, UpdatePopupMixin
 from sample_manage import models
-from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm)
+from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType, SequencingStep
 from sample_manage.utils import (get_auth_user, get_user_profile, check_permission,
                                  get_primary_task, get_step_names)
@@ -199,13 +199,16 @@ class AddFormView(FormView):
         form.save()
         return redirect('message', message_text=self.success_message)
 
+    def form_invalid(self, form):
+        return redirect('message', message_text='录入失败')
+
     def get(self, request, *args, **kwargs):
-        if self.permission and not check_permission(request, 'add_subject'):
+        if self.permission and not check_permission(request, self.permission):
             return redirect('message', message_text='你没有权限进行该操作')
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
-        if self.permission and not check_permission(request, 'add_subject'):
+        if self.permission and not check_permission(request, self.permission):
             return redirect('message', message_text='你没有权限进行该操作')
         return super().post(request, *args, **kwargs)
 
@@ -232,23 +235,65 @@ class AddSubjectInfoView(AddFormView):
     success_message = '受检者登记成功'
 
 
-class AddSampleTypeView(AddFormView):
+class BaseAddForm(CreatePopupMixin, generic.CreateView):
+    template_name = 'form_popup.html'
+    permission = None
+
+    def get(self, request, *args, **kwargs):
+        if self.permission and not check_permission(request, self.permission):
+            return redirect('message', message_text='你没有权限进行该操作')
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.permission and not check_permission(request, self.permission):
+            return redirect('message', message_text='你没有权限进行该操作')
+        return super().post(request, *args, **kwargs)
+
+
+class BaseEditForm(UpdatePopupMixin, generic.UpdateView):
+    template_name = 'form_popup.html'
+    permission = None
+
+    def get(self, request, *args, **kwargs):
+        print(self.is_popup())
+        if self.permission and not check_permission(request, self.permission):
+            return redirect('message', message_text='你没有权限进行该操作')
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if self.permission and not check_permission(request, self.permission):
+            return redirect('message', message_text='你没有权限进行该操作')
+        return super().post(request, *args, **kwargs)
+
+
+class AddSampleTypePopupView(BaseAddForm):
     form_class = SampleTypeForm
-    model_name = SampleType
     permission = 'add_sample_type'
-    success_message = '样本类型登记成功'
 
 
-class AddSampleTypePopupView(CreatePopupMixin, generic.CreateView):
-    template_name = 'form_popup.html'
-    model = SampleType
-    fields = ['type']
+class EditSampleTypePopupView(BaseEditForm):
+    form_class = SampleTypeForm
+    permission = 'add_sample_type'
 
 
-class EditSampleTypePopupView(UpdatePopupMixin, generic.UpdateView):
-    template_name = 'form_popup.html'
-    model = SampleType
-    fields = ['type']
+class AddProjectPopupView(BaseAddForm):
+    form_class = ProjectForm
+    permission = 'add_project'
+
+
+class EditProjectPopupView(BaseEditForm):
+    form_class = ProjectForm
+    permission = 'add_project'
+
+
+class AddSubjectInfoPopupView(BaseAddForm):
+    form_class = SubjectInfoForm
+    permission = 'add_subject'
+
+
+class EditSubjectInfoPopupView(BaseEditForm):
+    form_class = SubjectInfoForm
+    permission = 'add_subject'
 
 
 class TaskView(View):

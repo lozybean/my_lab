@@ -2,6 +2,7 @@ import datetime
 
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
+from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from sample_manage.models import (SampleInfo, SampleType, Project, SubjectInfo,
                                   FamilyInfo)
@@ -38,27 +39,12 @@ class LoginForm(forms.Form):
 
 
 class SampleInfoForm(forms.ModelForm):
-    name = forms.CharField(
-        required=True,
-        label='样本名称',
-        error_messages={'required': '必须输入样本名称'},
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': '请输入样本名称(检测名称)',
-            }
-        )
-    )
-    barcode = forms.CharField(
-        required=True,
-        label='样本条码',
-        error_messages={'required': '必须输入样本条码',
-                        'unique': '该样本条码已经存在，请核对或者修改已有样本'},
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': '请输入样本条码号',
-            }
-        )
-    )
+    def clean_barcode(self):
+        barcode = self.cleaned_data.get('barcode', '')
+        if SampleInfo.objects.filter(barcode=barcode).exists():
+            raise ValidationError("该样本条码已经存在，请核对或者修改已有样本！")
+        return barcode
+
     type = forms.ModelChoiceField(
         label='样本类型',
         queryset=SampleType.objects,
@@ -68,12 +54,14 @@ class SampleInfoForm(forms.ModelForm):
             edit_related_url=reverse_lazy('edit_sample_type_popup', args=['__fk__']),
         )
     )
-    quantity = forms.CharField(
-        label='样本量',
-    )
     project = forms.ModelChoiceField(
-        queryset=Project.objects,
         label='项目类型',
+        queryset=Project.objects,
+        widget=AddAnotherEditSelectedWidgetWrapper(
+            widget=forms.Select,
+            add_related_url=reverse_lazy('add_project_popup'),
+            edit_related_url=reverse_lazy('edit_project_popup', args=['__fk__']),
+        )
     )
     hospital = forms.CharField(
         label='送检医院',
@@ -86,8 +74,14 @@ class SampleInfoForm(forms.ModelForm):
     subject = forms.ModelChoiceField(
         label='受检者',
         queryset=SubjectInfo.objects,
+        widget=AddAnotherEditSelectedWidgetWrapper(
+            widget=forms.Select,
+            add_related_url=reverse_lazy('add_subject_popup'),
+            edit_related_url=reverse_lazy('edit_subject_popup', args=['__fk__']),
+        )
     )
     date_sampling = forms.DateTimeField(
+        required=True,
         label='采样时间',
         widget=DateTimeWidget(
             usel10n=True,
@@ -96,6 +90,7 @@ class SampleInfoForm(forms.ModelForm):
     )
     date_receive = forms.DateTimeField(
         initial=datetime.datetime.now(),
+        required=True,
         label='样本接收时间',
         widget=DateTimeWidget(
             usel10n=True,
@@ -104,18 +99,11 @@ class SampleInfoForm(forms.ModelForm):
     )
     date_deadline = forms.DateTimeField(
         label='报告截止时间',
+        required=True,
         widget=DateTimeWidget(
             usel10n=True,
             bootstrap_version=3,
         )
-    )
-    has_request_note = forms.BooleanField(
-        label='是否有检测申请单',
-        initial=True,
-    )
-    has_informed_note = forms.BooleanField(
-        label='是否有知情同意书',
-        initial=True,
     )
 
     class Meta:
@@ -126,46 +114,10 @@ class SampleInfoForm(forms.ModelForm):
 
 
 class SubjectInfoForm(forms.ModelForm):
-    name = forms.CharField(
-        label='受检者姓名'
-    )
-    gender = forms.ChoiceField(
-        label='性别',
-        choices=(('male', '男'), ('female', '女')),
-    )
-    age = forms.IntegerField(
-        label='年龄',
-    )
-    nationality = forms.CharField(
-        label='名族',
-        initial='汉族',
-    )
-    native_place = forms.CharField(
-        label='籍贯',
-    )
-    diagnosis = forms.CharField(
-        label='临床诊断',
-        required=False,
-        widget=forms.Textarea()
-    )
-    family_history = forms.CharField(
-        label='家族史',
-        required=False,
-        widget=forms.Textarea()
-    )
     family = forms.ModelChoiceField(
         label='家系',
         required=False,
         queryset=FamilyInfo.objects,
-    )
-    relation_ship = forms.CharField(
-        label='家系关系',
-        required=False,
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': '和家系中先证者的关系',
-            }
-        )
     )
 
     class Meta:
@@ -174,10 +126,12 @@ class SubjectInfoForm(forms.ModelForm):
 
 
 class SampleTypeForm(forms.ModelForm):
-    type = forms.CharField(
-        label='样本类型'
-    )
-
     class Meta:
         model = SampleType
+        fields = '__all__'
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
         fields = '__all__'

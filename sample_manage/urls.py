@@ -30,8 +30,16 @@ urlpatterns = [
 
     url(r'^add/sample_info/(?P<pk>\d+)?$', views.AddSampleInfoView.as_view(), name='add_sample_info'),
     url(r'^add/subject_info/(?P<pk>\d+)?$', views.AddSubjectInfoView.as_view(), name='add_subject_info'),
-    url(r'^add/sample_type/(?P<pk>\d+)?$', views.AddSampleTypeView.as_view(), name='add_sample_type'),
+
     url(r'^add/sample_type/popup/add$', views.AddSampleTypePopupView.as_view(), name='add_sample_type_popup'),
     url(r'^add/sample_type/popup/edit/(?P<pk>.*)/$', views.EditSampleTypePopupView.as_view(),
         name='edit_sample_type_popup'),
+
+    url(r'^add/project/popup/add$', views.AddProjectPopupView.as_view(), name='add_project_popup'),
+    url(r'^add/project/popup/edit/(?P<pk>.*)/$', views.EditProjectPopupView.as_view(),
+        name='edit_project_popup'),
+
+    url(r'^add/subject/popup/add$', views.AddSubjectInfoPopupView.as_view(), name='add_subject_popup'),
+    url(r'^add/subject/popup/edit/(?P<pk>.*)/$', views.EditSubjectInfoPopupView.as_view(),
+        name='edit_subject_popup'),
 ]
