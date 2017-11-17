@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_addanother',
     'bootstrap3',
     'datetimewidget',
     'sample_manage',

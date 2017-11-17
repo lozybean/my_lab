@@ -1,0 +1,23 @@
+<div class="input-group">
+    <select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+        {% for group_name, group_choices, group_index in widget.optgroups %}
+            {% if group_name %}
+                <optgroup label="{{ group_name }}">{% endif %}
+        {% for option in group_choices %}
+            {% include option.template_name with widget=option %}
+        {% endfor %}
+        {% if group_name %}</optgroup>{% endif %}{% endfor %}
+    </select>
+    <span class="input-group-addon">
+        <a href="{{ widget.attrs.popup_href }}?_popup=1" onclick="return showAddAnotherPopup(this);"
+        class="add-another" id="edit_id_{{ widget.name }}">
+            <span class="glyphicon glyphicon-edit"></span>
+        </a>
+    </span>
+    <span class="input-group-addon">
+        <a href="{{ widget.attrs.popup_href }}?_popup=1" onclick="return showAddAnotherPopup(this);"
+        class="add-another" id="add_id_{{ widget.name }}">
+            <span class="glyphicon glyphicon-plus"></span>
+        </a>
+    </span>
+</div>

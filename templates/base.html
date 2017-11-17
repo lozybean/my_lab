@@ -7,18 +7,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>my lab</title>
-    <script src="{% bootstrap_jquery_url %}"></script>
+    {#    <script src="{% bootstrap_jquery_url %}"></script>#}
+    <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     <link rel="stylesheet" href="{% static 'css/lab.css' %}">
     {% if form %}
         {{ form.media }}
     {% endif %}
-    <script type="text/javascript" src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
 </head>
 
 <body>
-{% if sub_page %}
+{% if view.is_popup %}
 {% else %}
     {% include 'navbar.html' %}
 {% endif %}

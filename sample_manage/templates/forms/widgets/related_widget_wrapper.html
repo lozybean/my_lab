@@ -1,0 +1,25 @@
+{% load i18n static %}
+<div class="related-widget-wrapper input-group">
+    {{ widget }}
+
+    {% if edit_related_url %}
+        <span class="input-group-addon">
+        <a data-href-template="{{ edit_related_url }}?{{ url_params }}"
+           class="related-widget-wrapper-link change-related"
+           title="{% blocktrans %}Edit {{ name }}{% endblocktrans %}"
+           id="change_id_{{ name }}">
+            <span class="glyphicon glyphicon-edit"></span>
+        </a>
+        </span>
+    {% endif %}
+    {% if add_related_url %}
+        <span class="input-group-addon">
+        <a href="{{ add_related_url }}?{{ url_params }}"
+           class="related-widget-wrapper-link add-related"
+           title="{% blocktrans %}Add {{ name }}{% endblocktrans %}"
+           id="add_id_{{ name }}">
+            <span class="glyphicon glyphicon-plus"></span>
+        </a>
+        </span>
+    {% endif %}
+</div>

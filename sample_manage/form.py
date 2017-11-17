@@ -2,10 +2,10 @@ import datetime
 
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
-from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from sample_manage.models import (SampleInfo, SampleType, Project, SubjectInfo,
                                   FamilyInfo)
+from sample_manage.widget import AddAnotherEditSelectedWidgetWrapper
 
 
 class LoginForm(forms.Form):
@@ -37,27 +37,6 @@ class LoginForm(forms.Form):
             super().clean()
 
 
-class SelectWithPop(forms.Select):
-    def __init__(self, *args, **kwargs):
-        if 'popup_href' in kwargs['attrs']:
-            self.popup_href = kwargs['attrs'].pop('popup_href')
-        else:
-            self.popup_href = ''
-        super().__init__(*args, **kwargs)
-
-    def render(self, name, *args, **kwargs):
-        html = super(SelectWithPop, self).render(name, *args, **kwargs)
-        popupplus = render_to_string("widget/popupplus.html", {'href': self.popup_href})
-        return html + popupplus
-
-
-class MultipleSelectWithPop(forms.SelectMultiple):
-    def render(self, name, *args, **kwargs):
-        html = super(MultipleSelectWithPop, self).render(name, *args, **kwargs)
-        popupplus = render_to_string("widget/popupplus.html", {'field': name})
-        return html + popupplus
-
-
 class SampleInfoForm(forms.ModelForm):
     name = forms.CharField(
         required=True,
@@ -83,11 +62,11 @@ class SampleInfoForm(forms.ModelForm):
     type = forms.ModelChoiceField(
         label='样本类型',
         queryset=SampleType.objects,
-        widget=SelectWithPop(
-            attrs={
-                'popup_href': reverse_lazy('add_sample_type'),
-            }
-        ),
+        widget=AddAnotherEditSelectedWidgetWrapper(
+            widget=forms.Select,
+            add_related_url=reverse_lazy('add_sample_type_popup'),
+            edit_related_url=reverse_lazy('edit_sample_type_popup', args=['__fk__']),
+        )
     )
     quantity = forms.CharField(
         label='样本量',

@@ -5,8 +5,10 @@ from django.contrib import auth
 from django.shortcuts import get_object_or_404, get_list_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.html import escape
+from django.views import generic
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import FormView
+from django_addanother.views import CreatePopupMixin, UpdatePopupMixin
 from sample_manage import models
 from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType, SequencingStep
@@ -235,6 +237,18 @@ class AddSampleTypeView(AddFormView):
     model_name = SampleType
     permission = 'add_sample_type'
     success_message = '样本类型登记成功'
+
+
+class AddSampleTypePopupView(CreatePopupMixin, generic.CreateView):
+    template_name = 'form_popup.html'
+    model = SampleType
+    fields = ['type']
+
+
+class EditSampleTypePopupView(UpdatePopupMixin, generic.UpdateView):
+    template_name = 'form_popup.html'
+    model = SampleType
+    fields = ['type']
 
 
 class TaskView(View):

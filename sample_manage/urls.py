@@ -11,7 +11,6 @@ urlpatterns = [
     url(r'^sample_info/(?P<sample_id>\d+)/$', views.SampleInfoView.as_view(), name='sample_info'),
     url(r'^sample_info/barcode/$', views.SampleInfoView.as_view(), name='query_sample_by_barcode'),
 
-
     # sample list and queries
     url(r'^sample_list/$', views.SampleListView.as_view(), name='sample_list'),
     url(r'^sample_list/project/(?P<project_id>\d+)/$',
@@ -32,4 +31,7 @@ urlpatterns = [
     url(r'^add/sample_info/(?P<pk>\d+)?$', views.AddSampleInfoView.as_view(), name='add_sample_info'),
     url(r'^add/subject_info/(?P<pk>\d+)?$', views.AddSubjectInfoView.as_view(), name='add_subject_info'),
     url(r'^add/sample_type/(?P<pk>\d+)?$', views.AddSampleTypeView.as_view(), name='add_sample_type'),
+    url(r'^add/sample_type/popup/add$', views.AddSampleTypePopupView.as_view(), name='add_sample_type_popup'),
+    url(r'^add/sample_type/popup/edit/(?P<pk>.*)/$', views.EditSampleTypePopupView.as_view(),
+        name='edit_sample_type_popup'),
 ]
