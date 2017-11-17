@@ -235,9 +235,10 @@ class AddSubjectInfoView(AddFormView):
     success_message = '受检者登记成功'
 
 
-class BaseAddForm(CreatePopupMixin, generic.CreateView):
+class BaseAddFormView(CreatePopupMixin, generic.CreateView):
     template_name = 'form_popup.html'
     permission = None
+    fields = None
 
     def get(self, request, *args, **kwargs):
         if self.permission and not check_permission(request, self.permission):
@@ -250,9 +251,10 @@ class BaseAddForm(CreatePopupMixin, generic.CreateView):
         return super().post(request, *args, **kwargs)
 
 
-class BaseEditForm(UpdatePopupMixin, generic.UpdateView):
+class BaseEditFormView(UpdatePopupMixin, generic.UpdateView):
     template_name = 'form_popup.html'
     permission = None
+    fields = None
 
     def get(self, request, *args, **kwargs):
         print(self.is_popup())
@@ -266,33 +268,36 @@ class BaseEditForm(UpdatePopupMixin, generic.UpdateView):
         return super().post(request, *args, **kwargs)
 
 
-class AddSampleTypePopupView(BaseAddForm):
+class AddSampleTypePopupView(BaseAddFormView):
     form_class = SampleTypeForm
     permission = 'add_sample_type'
 
 
-class EditSampleTypePopupView(BaseEditForm):
+class EditSampleTypePopupView(BaseEditFormView):
     form_class = SampleTypeForm
+    model = SampleType
     permission = 'add_sample_type'
 
 
-class AddProjectPopupView(BaseAddForm):
+class AddProjectPopupView(BaseAddFormView):
     form_class = ProjectForm
     permission = 'add_project'
 
 
-class EditProjectPopupView(BaseEditForm):
+class EditProjectPopupView(BaseEditFormView):
     form_class = ProjectForm
+    model = Project
     permission = 'add_project'
 
 
-class AddSubjectInfoPopupView(BaseAddForm):
+class AddSubjectInfoPopupView(BaseAddFormView):
     form_class = SubjectInfoForm
     permission = 'add_subject'
 
 
-class EditSubjectInfoPopupView(BaseEditForm):
+class EditSubjectInfoPopupView(BaseEditFormView):
     form_class = SubjectInfoForm
+    model = SubjectInfo
     permission = 'add_subject'
 
 
