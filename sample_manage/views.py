@@ -122,7 +122,7 @@ class SampleListView(TemplateView):
     @staticmethod
     def get_sample_list_by_date(step, year, month, day, status=None):
         query_date = datetime.date(int(year), int(month), int(day))
-        if step == 'sample_received':
+        if step == 'sample_receive':
             kwargs = {
                 f'date_receive__date': query_date
             }
@@ -339,7 +339,7 @@ class TaskView(View):
         if not check_permission(request, primary_task):
             return redirect('message', message_text='你没有权限进行该操作')
         if primary_task == 'sample_receive':
-            return redirect('add_subject_info')
+            return redirect('add_sample_info')
         if not primary_task:
             return redirect('message', message_text='尚未设置主要任务')
         return redirect('sample_pipe', step_name=primary_task, status=status)

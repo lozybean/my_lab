@@ -10,8 +10,8 @@
         <ul class="nav navbar-nav">
 
             {% if user.userprofile.primary_task == 'sample_receive' %}
-                <li><a href="{% url 'add_subject_info' %}">受检者信息录入</a></li>
                 <li><a href="{% url 'add_sample_info' %}">样本录入</a></li>
+{#                <li><a href="{% url 'add_subject_info' %}">受检者信息录入</a></li>#}
             {% elif user.is_authenticated %}
                 <li><a href="{% url 'task' status='begin' primary_task=user.userprofile.primary_task %}">新的任务</a></li>
                 <li><a href="{% url 'task' status='end' primary_task=user.userprofile.primary_task %}">进行中的任务</a></li>

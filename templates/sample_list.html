@@ -40,7 +40,7 @@
                     </td>
                     <td>
                         {% if sample.date_receive %}
-                            <a href="{% url 'query_sample_by_date' step='sample_received' year=sample.date_receive.year month=sample.date_receive.month day=sample.date_receive.day status=1 %}">
+                            <a href="{% url 'query_sample_by_date' step='sample_receive' year=sample.date_receive.year month=sample.date_receive.month day=sample.date_receive.day status=1 %}">
                                 {{ sample.date_receive|date_format }}
                             </a>
                         {% else %}
