@@ -46,7 +46,7 @@ class UserProfile(models.Model):
 class Project(models.Model):
     name = models.TextField(null=True, blank=True, verbose_name='项目名称')
 
-    period_day = models.IntegerField(verbose_name='项目周期/工作日')
+    period_day = models.IntegerField(verbose_name='项目周期/工作日', default=0)
 
     def __str__(self):
         return self.name

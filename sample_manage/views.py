@@ -14,7 +14,8 @@ from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, Samp
                                 FamilyInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType, SequencingStep
 from sample_manage.utils import (get_auth_user, get_user_profile, check_permission,
-                                 get_primary_task, get_step_names)
+                                 get_primary_task, get_step_names, get_sample_from_lims,
+                                 get_subject_from_lims)
 
 
 # Create your views here.
@@ -209,6 +210,7 @@ class AddFormView(FormView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
+        print(request.POST)
         if self.permission and not check_permission(request, self.permission):
             return redirect('message', message_text='你没有权限进行该操作')
         return super().post(request, *args, **kwargs)
@@ -219,6 +221,16 @@ class AddSampleInfoView(AddFormView):
     model_name = SampleInfo
     permission = 'sample_receive'
     success_message = '样本登记成功'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(lims_search=reverse_lazy('add_sample_info'))
+        barcode = self.request.GET.get('barcode', None)
+        if barcode:
+            sample = get_sample_from_lims(barcode)
+            form = self.form_class(instance=sample)
+            context.update(form=form)
+        return context
 
     def form_valid(self, form):
         sample_pipe = SamplePipe()
@@ -293,6 +305,16 @@ class EditProjectPopupView(BaseEditFormView):
 class AddSubjectInfoPopupView(BaseAddFormView):
     form_class = SubjectInfoForm
     permission = 'add_subject'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(lims_search=reverse_lazy('add_subject_popup'))
+        barcode = self.request.GET.get('barcode', None)
+        if barcode:
+            sample = get_subject_from_lims(barcode)
+            form = self.form_class(instance=sample)
+            context.update(form=form)
+        return context
 
 
 class EditSubjectInfoPopupView(BaseEditFormView):

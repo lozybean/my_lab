@@ -8,6 +8,24 @@
             {{ error_message }}
         </div>
     {% endif %}
+    {% if lims_search %}
+        <div class="well">
+            <form action="{{ lims_search }}" method="GET" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="barcode_input" class="col-md-4 control-label">
+                        根据条码从lims中拉取
+                    </label>
+                    <div class="col-md-4">
+                        <input type="text" id="barcode_input" name="barcode" title
+                               class="form-control">
+                    </div>
+                    <button type="submit" class="col-md-1 btn btn-primary">拉取</button>
+                </div>
+
+            </form>
+        </div>
+    {% endif %}
     <div class="well">
         <form class="form-horizontal" role="form" action="" method="POST">
             {% csrf_token %}
