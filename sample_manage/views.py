@@ -10,7 +10,8 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import FormView
 from django_addanother.views import CreatePopupMixin, UpdatePopupMixin
 from sample_manage import models
-from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm)
+from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm,
+                                FamilyInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType, SequencingStep
 from sample_manage.utils import (get_auth_user, get_user_profile, check_permission,
                                  get_primary_task, get_step_names)
@@ -257,7 +258,6 @@ class BaseEditFormView(UpdatePopupMixin, generic.UpdateView):
     fields = None
 
     def get(self, request, *args, **kwargs):
-        print(self.is_popup())
         if self.permission and not check_permission(request, self.permission):
             return redirect('message', message_text='你没有权限进行该操作')
         return super().get(request, *args, **kwargs)
@@ -297,6 +297,17 @@ class AddSubjectInfoPopupView(BaseAddFormView):
 
 class EditSubjectInfoPopupView(BaseEditFormView):
     form_class = SubjectInfoForm
+    model = SubjectInfo
+    permission = 'add_subject'
+
+
+class AddFamilyInfoPopupView(BaseAddFormView):
+    form_class = FamilyInfoForm
+    permission = 'add_subject'
+
+
+class EditFamilyInfoPopupView(BaseEditFormView):
+    form_class = FamilyInfoForm
     model = SubjectInfo
     permission = 'add_subject'
 

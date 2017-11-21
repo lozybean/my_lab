@@ -118,10 +118,21 @@ class SubjectInfoForm(forms.ModelForm):
         label='家系',
         required=False,
         queryset=FamilyInfo.objects,
+        widget=AddAnotherEditSelectedWidgetWrapper(
+            widget=forms.Select,
+            add_related_url=reverse_lazy('add_family_popup'),
+            edit_related_url=reverse_lazy('edit_family_popup', args=['__fk__']),
+        )
     )
 
     class Meta:
         model = SubjectInfo
+        fields = '__all__'
+
+
+class FamilyInfoForm(forms.ModelForm):
+    class Meta:
+        model = FamilyInfo
         fields = '__all__'
 
 

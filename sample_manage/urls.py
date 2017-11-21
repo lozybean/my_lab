@@ -42,4 +42,8 @@ urlpatterns = [
     url(r'^add/subject/popup/add$', views.AddSubjectInfoPopupView.as_view(), name='add_subject_popup'),
     url(r'^add/subject/popup/edit/(?P<pk>.*)/$', views.EditSubjectInfoPopupView.as_view(),
         name='edit_subject_popup'),
+
+    url(r'^add/family/popup/add$', views.AddFamilyInfoPopupView.as_view(), name='add_family_popup'),
+    url(r'^add/family/popup/edit/(?P<pk>.*)/$', views.EditFamilyInfoPopupView.as_view(),
+        name='edit_family_popup'),
 ]
