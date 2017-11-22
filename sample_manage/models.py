@@ -7,6 +7,7 @@ from django.db import models
 STATUS = (('sample_receive', '样本接收'),
           ('dna_extract', 'DNA提取'),
           ('lib_build', '文库构建'),
+          ('quantify', '上机前定量'),
           ('sequencing', '上机测序'),
           ('bioinfo', '生信分析'),
           ('report', '报告撰写'),
@@ -33,9 +34,12 @@ class UserProfile(models.Model):
     add_project = models.BooleanField(default=False, verbose_name='增加检测项目')
 
     sample_receive = models.BooleanField(default=False, verbose_name='样本接收')
+
     dna_extract = models.BooleanField(default=False, verbose_name='DNA提取')
     lib_build = models.BooleanField(default=False, verbose_name='文库构建')
+    quantify = models.BooleanField(default=False, verbose_name='上机前定量')
     sequencing = models.BooleanField(default=False, verbose_name='上机测序')
+
     bioinfo = models.BooleanField(default=False, verbose_name='生信分析')
     report = models.BooleanField(default=False, verbose_name='报告撰写')
 
@@ -93,6 +97,9 @@ class DnaExtractStep(models.Model):
                                  related_name='%(app_label)s_%(class)s_dna_extract',
                                  verbose_name='操作人员')
 
+    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
+    pass_qc = models.BooleanField(default=False, verbose_name='通过质控')
+
     def __str__(self):
         return f'操作人: {self.operator}'
 
@@ -106,13 +113,26 @@ class LibBuildStep(models.Model):
 
     index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
     index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
+    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
+    pass_qc = models.BooleanField(default=False, verbose_name='通过质控')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+
+class QuantifyStep(models.Model):
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
+    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_quantify',
+                                 verbose_name='操作人员')
 
     def __str__(self):
         return f'操作人: {self.operator}'
 
 
 class SequencingStep(models.Model):
-    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间', )
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
                                  related_name='%(app_label)s_%(class)s_dna_extract',
@@ -155,6 +175,8 @@ class SamplePipe(models.Model):
     dna_extract_step = models.ForeignKey(DnaExtractStep, blank=True, null=True, verbose_name='DNA提取')
 
     lib_build_step = models.ForeignKey(LibBuildStep, blank=True, null=True, verbose_name='文库构建')
+
+    quantify_step = models.ForeignKey(QuantifyStep, blank=True, null=True, verbose_name='上机前定量')
 
     sequencing_step = models.ForeignKey(SequencingStep, blank=True, null=True, verbose_name='上机测序')
 

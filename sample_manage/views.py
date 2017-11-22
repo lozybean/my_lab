@@ -211,7 +211,7 @@ class AddFormView(FormView):
     def get(self, request, *args, **kwargs):
         if self.permission and not check_permission(request, self.permission):
             return redirect('message', message_text='你没有权限进行该操作')
-        return super().get(request, *args, **kwargs)
+        return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
         if self.permission and not check_permission(request, self.permission):
@@ -226,7 +226,7 @@ class AddSampleInfoView(AddFormView):
     success_message = '样本登记成功'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(AddSampleInfoView, self).get_context_data(**kwargs)
         context.update(lims_search=reverse_lazy('add_sample_info'))
         barcode = self.request.GET.get('barcode', None)
         if barcode:
@@ -394,6 +394,8 @@ class SamplePipeView(TemplateView):
         return context
 
     def get(self, request, *args, step_name=None, status=None, **kwargs):
+        if not check_permission(request, step_name):
+            return redirect('message', message_text='你没有权限进行该操作')
         self.step_name = step_name
         self.status = status
         if self.status not in ['begin', 'end']:
@@ -434,16 +436,12 @@ class SamplePipeView(TemplateView):
             if step.operator != auth_user:
                 return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
             step.save()
-            # # 修改流程状态
-            # setattr(sample_pipe, current_step_name, step)
-            # sample_pipe.save()
-            # # 修改样本状态
-            # sample.sample_pipe = sample_pipe
-            # sample.save()
         # 重定向到新的任务
         return redirect('sample_pipe', step_name=self.step_name, status='begin')
 
     def post(self, request, *args, step_name=None, status=None, **kwargs):
+        if not check_permission(request, step_name):
+            return redirect('message', message_text='你没有权限进行该操作')
         self.step_name = step_name
         self.status = status
         auth_user = get_auth_user(request)
@@ -453,9 +451,12 @@ class SamplePipeView(TemplateView):
         if self.status == 'begin':
             return self.set_pipe_begin(samples, current_time, auth_user)
         elif self.status == 'end' and not kwargs['success']:
+            if self.step_name == 'dna_extract':
+                request.session['sample_list'] = sample_id_list
+                return redirect('dna_extract_info')
             if self.step_name == 'lib_build':
                 request.session['sample_list'] = sample_id_list
-                return redirect('input_index_info')
+                return redirect('lib_build_info')
             return self.set_pipe_end(samples, current_time, auth_user)
         elif kwargs['success']:
             return self.set_pipe_end(samples, current_time, auth_user)
@@ -463,9 +464,9 @@ class SamplePipeView(TemplateView):
             return redirect('message', message_text='状态错误，请重试！')
 
 
-class IndexInfoInputView(TemplateView):
-    step_name = 'lib_build'
-    template_name = 'step_infos/index_info.html'
+class BaseSamplePipeView(TemplateView):
+    step_name = None
+    template_name = None
 
     @staticmethod
     def get_samples(sample_id_list):
@@ -487,13 +488,77 @@ class IndexInfoInputView(TemplateView):
     def post(self, request, **kwargs):
         if not check_permission(request, self.step_name):
             return redirect('message', message_text='你没有权限进行该操作')
-        return self.set_index_seq(request, **kwargs)
+        return self.finish_step(request, **kwargs)
 
-    def set_index_seq(self, request, **kwargs):
+    def finish_step(self, request, **kwargs):
+        raise NotImplementedError("must implement finish_step")
+
+
+class DnaExtractInfoView(BaseSamplePipeView):
+    step_name = 'dna_extract'
+    template_name = 'step_infos/dna_extract_info.html'
+
+    def finish_step(self, request, **kwargs):
+        auth_user = get_auth_user(request)
+        current_time = datetime.datetime.now()
+        store_place_list = request.POST.getlist('store_place_list')
+        pass_qc_list = request.POST.getlist('pass_qc_list')
+        sample_id_list = request.POST.getlist('sample_list')
+        for ind, sample_id in enumerate(sample_id_list):
+            sample = get_object_or_None(SampleInfo, id=sample_id)
+            if sample is None:
+                continue
+            step = getattr(sample.sample_pipe, f'{self.step_name}_step')
+            # 保存index序列
+            step.end = current_time
+            step.store_place = store_place_list[ind]
+            step.pass_qc = pass_qc_list[ind]
+            if step.operator != auth_user:
+                return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
+            step.save()
+
+        # 重定向到新的任务
+        return redirect('sample_pipe', step_name=self.step_name, status='begin')
+
+
+class QuantifyInfoView(BaseSamplePipeView):
+    step_name = 'quantify'
+    template_name = 'step_infos/quantify_info.html'
+
+    def finish_step(self, request, **kwargs):
+        auth_user = get_auth_user(request)
+        current_time = datetime.datetime.now()
+        store_place_list = request.POST.getlist('store_place_list')
+        pass_qc_list = request.POST.getlist('pass_qc_list')
+        sample_id_list = request.POST.getlist('sample_list')
+        for ind, sample_id in enumerate(sample_id_list):
+            sample = get_object_or_None(SampleInfo, id=sample_id)
+            if sample is None:
+                continue
+            step = getattr(sample.sample_pipe, f'{self.step_name}_step')
+            # 保存index序列
+            step.end = current_time
+            step.store_place = store_place_list[ind]
+            step.pass_qc = pass_qc_list[ind]
+            if step.operator != auth_user:
+                return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
+            step.save()
+
+        # 重定向到新的任务
+        return redirect('sample_pipe', step_name=self.step_name, status='begin')
+
+
+class LibBuildInfoView(BaseSamplePipeView):
+    step_name = 'lib_build'
+    template_name = 'step_infos/lib_build_info.html'
+
+    def finish_step(self, request, **kwargs):
         auth_user = get_auth_user(request)
         current_time = datetime.datetime.now()
         index1_list = request.POST.getlist('index1_list')
         index2_list = request.POST.getlist('index2_list')
+        store_place_list = request.POST.getlist('store_place_list')
+        pass_qc_list = request.POST.getlist('pass_qc_list')
         sample_id_list = request.POST.getlist('sample_list')
         for ind, sample_id in enumerate(sample_id_list):
             sample = get_object_or_None(SampleInfo, id=sample_id)
@@ -504,6 +569,8 @@ class IndexInfoInputView(TemplateView):
             step.end = current_time
             step.index1_seq = index1_list[ind]
             step.index2_seq = index2_list[ind]
+            step.store_place = store_place_list[ind]
+            step.pass_qc = pass_qc_list[ind]
             if step.operator != auth_user:
                 return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
             step.save()

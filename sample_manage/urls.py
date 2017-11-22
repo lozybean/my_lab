@@ -27,7 +27,9 @@ urlpatterns = [
         views.SamplePipeView.as_view(), name='sample_pipe'),
     url(r'^task/(?P<primary_task>\w+)/(?P<status>\w+)/$', views.TaskView.as_view(), name='task'),
 
-    url(r'^index_info/(?P<sample_id>\d+)?$', views.IndexInfoInputView.as_view(), name='input_index_info'),
+    url(r'^lib_build_info/(?P<sample_id>\d+)?$', views.LibBuildInfoView.as_view(), name='lib_build_info'),
+    url(r'^dna_extract_info/(?P<sample_id>\d+)?$', views.DnaExtractInfoView.as_view(), name='dna_extract_info'),
+    url(r'^quantify_info/(?P<sample_id>\d+)?$', views.QuantifyInfoView.as_view(), name='quantify_info'),
 
     url(r'^add/sample_info/(?P<pk>\d+)?$', views.AddSampleInfoView.as_view(), name='add_sample_info'),
     url(r'^add/subject_info/(?P<pk>\d+)?$', views.AddSubjectInfoView.as_view(), name='add_subject_info'),

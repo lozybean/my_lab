@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 {% load set_var %}
+{% load display_none %}
 {% block content %}
-    <form action="{% url 'input_index_info' %}" method="POST">
+    <form action="{% url 'lib_build_info' %}" method="POST">
         {% csrf_token %}
         <div class="panel panel-default">
             <div class="panel-heading text-center" id="sample_pipe_title">
-                输入样本INDEX序列
+                建库信息
             </div>
             {% if message %}
                 <h4>
@@ -17,26 +18,32 @@
                 <table class="table table-responsive">
                     <thead class="thead-default">
                     <tr>
-                        <th width="25%">
+                        <th width="15%">
                             样本名称
                         </th>
-                        <th width="20%">
+                        <th width="15%">
                             样本条码
                         </th>
-                        <th width="25%">
+                        <th width="15%">
                             INDEX1
                         </th>
-                        <th width="25%">
+                        <th width="15%">
                             INDEX2
                         </th>
-                        <th width="5%">
+                        <th width="20%">
+                            存储位置
+                        </th>
+                        <th width="20%">
+                            是否通过质控
+                        </th>
+                        <th width="0%">
 
                         </th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for sample in sample_list %}
-                        {% set step = sample.sample_pipe.sequencing_step %}
+                        {% set step = sample.sample_pipe.lib_build_step %}
                         <tr>
                             <td>
                                 <a href="{% url 'sample_info' sample_id=sample.id %}">
@@ -49,10 +56,19 @@
                                 </a>
                             </td>
                             <td>
-                                <input type="text" title required name="index1_list" value="{{ step.index1_seq }}">
+                                <input type="text" title required name="index1_list"
+                                       value="{{ step.index1_seq|display_none:'' }}">
                             </td>
                             <td>
-                                <input type="text" title name="index2_list" value="{{ step.index2_seq }}">
+                                <input type="text" title name="index2_list"
+                                       value="{{ step.index2_seq|display_none:'' }}">
+                            </td>
+                            <td>
+                                <input type="text" title name="store_place_list"
+                                       value="{{ step.store_place|display_none:'' }}">
+                            </td>
+                            <td>
+                                <input type="checkbox" title name="pass_qc_list" value="{{ step.pass_qc }}">
                             </td>
                             <td>
                                 <input type="text" title readonly hidden name="sample_list" class="hidden"
@@ -67,7 +83,7 @@
             <input type="text" name="set_pipe_info" value=1 title hidden>
         </div>
         <p class="form-actions">
-            <input type="submit" value="录入INDEX序列" class="btn btn-primary">
+            <input type="submit" value="确认并录入" class="btn btn-primary">
             <a href="#"><input type="button" value="退回" class="btn btn-danger"></a>
         </p>
     </form>

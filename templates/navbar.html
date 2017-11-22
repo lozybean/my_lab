@@ -32,6 +32,8 @@
                     <li><a href="{% url 'sample_pipe' step_name='dna_extract' status='end' %}">DNA提取中样本</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='lib_build' status='begin' %}">文库构建任务</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='lib_build' status='end' %}">文库构建中样本</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='quantify' status='begin' %}">上机前定量任务</a></li>
+                    <li><a href="{% url 'sample_pipe' step_name='quantify' status='end' %}">上机前定量样本</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='sequencing' status='begin' %}">上机测序任务</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='sequencing' status='end' %}">上机测序中样本</a></li>
                     <li><a href="{% url 'sample_pipe' step_name='bioinfo' status='begin' %}">生物信息任务</a></li>
