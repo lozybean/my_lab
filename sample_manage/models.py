@@ -104,6 +104,9 @@ class LibBuildStep(models.Model):
                                  related_name='%(app_label)s_%(class)s_dna_extract',
                                  verbose_name='操作人员')
 
+    index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
+    index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
+
     def __str__(self):
         return f'操作人: {self.operator}'
 
@@ -114,9 +117,6 @@ class SequencingStep(models.Model):
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
                                  related_name='%(app_label)s_%(class)s_dna_extract',
                                  verbose_name='操作人员')
-
-    index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
-    index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
 
     def __str__(self):
         return f'操作人: {self.operator}'
@@ -178,6 +178,7 @@ class SampleInfo(models.Model):
     date_sampling = models.DateTimeField(blank=True, null=True, verbose_name='采样时间')
     date_receive = models.DateTimeField(blank=True, null=True, verbose_name='收样时间')
     date_deadline = models.DateTimeField(blank=True, null=True, verbose_name='截止时间')
+    date_submit = models.DateTimeField(blank=True, null=True, verbose_name='送检时间')
 
     has_request_note = models.BooleanField(default=True, verbose_name='是否有检测申请单')
     has_informed_note = models.BooleanField(default=True, verbose_name='是否有知情同意书')

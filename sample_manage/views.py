@@ -12,7 +12,7 @@ from django_addanother.views import CreatePopupMixin, UpdatePopupMixin
 from sample_manage import models
 from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm,
                                 FamilyInfoForm)
-from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType, SequencingStep
+from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType
 from sample_manage.utils import (get_auth_user, get_user_profile, check_permission,
                                  get_primary_task, get_step_names, get_sample_from_lims,
                                  get_subject_from_lims)
@@ -92,18 +92,20 @@ class SampleInfoView(TemplateView):
     template_name = 'sample_info.html'
 
     def get_context_data(self, sample_id, **kwargs):
+        context = super(SampleInfoView, self).get_context_data(**kwargs)
         sample = get_object_or_404(SampleInfo, id=sample_id)
         projects = Project.objects.all()
         sample_types = SampleType.objects.all()
-        return {'sample': sample, 'projects': projects,
-                'sample_types': sample_types}
+        context.update(**{'sample': sample, 'projects': projects,
+                          'sample_types': sample_types})
+        return context
 
-    def post(self, request):
+    def post(self, request, **kwargs):
         barcode = request.POST.get('barcode')
         sample = get_object_or_None(SampleInfo, barcode=barcode)
         if sample is None:
             return redirect('message', message_text='不存在该样本')
-        context = self.get_context_data(sample.id)
+        context = self.get_context_data(sample.id, **kwargs)
         return self.render_to_response(context)
 
 
@@ -187,6 +189,7 @@ class AddFormView(FormView):
         self.__dict__['model_name'] = value
 
     def get_context_data(self, **kwargs):
+        context = super(AddFormView, self).get_context_data(**kwargs)
         if 'pk' in kwargs:
             sample = get_object_or_None(self.model_name, id=kwargs['pk'])
             if sample is None:
@@ -195,7 +198,8 @@ class AddFormView(FormView):
                 form = self.form_class(instance=sample)
         else:
             form = self.form_class()
-        return {'form': form}
+        context.update(form=form)
+        return context
 
     def form_valid(self, form):
         form.save()
@@ -207,10 +211,9 @@ class AddFormView(FormView):
     def get(self, request, *args, **kwargs):
         if self.permission and not check_permission(request, self.permission):
             return redirect('message', message_text='你没有权限进行该操作')
-        return self.render_to_response(self.get_context_data(**kwargs))
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
         if self.permission and not check_permission(request, self.permission):
             return redirect('message', message_text='你没有权限进行该操作')
         return super().post(request, *args, **kwargs)
@@ -380,19 +383,22 @@ class SamplePipeView(TemplateView):
             return {'sample_list': samples, 'step_name': step_name, 'status': 'end',
                     'message': '没有进行中的样本'}
 
-    def get_context_data(self):
+    def get_context_data(self, **kwargs):
+        context = super(SamplePipeView, self).get_context_data(**kwargs)
         if self.status == 'begin':
-            return self.get_context_begin(self.step_name)
+            context_begin = self.get_context_begin(self.step_name)
+            context.update(**context_begin)
         else:
-            return self.get_context_end(self.step_name)
+            context_end = self.get_context_end(self.step_name)
+            context.update(**context_end)
+        return context
 
     def get(self, request, *args, step_name=None, status=None, **kwargs):
         self.step_name = step_name
         self.status = status
         if self.status not in ['begin', 'end']:
             return redirect('message', message_text='状态错误，请重试！')
-        context = self.get_context_data()
-        return self.render_to_response(context)
+        return super().get(request, *args, **kwargs)
 
     def set_pipe_begin(self, samples, current_time, auth_user):
         current_step_name = f'{self.step_name}_step'
@@ -428,12 +434,12 @@ class SamplePipeView(TemplateView):
             if step.operator != auth_user:
                 return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
             step.save()
-            # 修改流程状态
-            setattr(sample_pipe, current_step_name, step)
-            sample_pipe.save()
-            # 修改样本状态
-            sample.sample_pipe = sample_pipe
-            sample.save()
+            # # 修改流程状态
+            # setattr(sample_pipe, current_step_name, step)
+            # sample_pipe.save()
+            # # 修改样本状态
+            # sample.sample_pipe = sample_pipe
+            # sample.save()
         # 重定向到新的任务
         return redirect('sample_pipe', step_name=self.step_name, status='begin')
 
@@ -444,74 +450,63 @@ class SamplePipeView(TemplateView):
         current_time = datetime.datetime.now()
         sample_id_list = request.POST.getlist('sample_list')
         samples = SampleInfo.objects.filter(id__in=sample_id_list)
-
         if self.status == 'begin':
-            if self.step_name == 'sequencing':
-                # return self.sequencing_step_info(request)
-                return redirect('sequencing_step_info')
-            else:
-                return self.set_pipe_begin(samples, current_time, auth_user)
-        elif self.status == 'end':
+            return self.set_pipe_begin(samples, current_time, auth_user)
+        elif self.status == 'end' and not kwargs['success']:
+            if self.step_name == 'lib_build':
+                request.session['sample_list'] = sample_id_list
+                return redirect('input_index_info')
+            return self.set_pipe_end(samples, current_time, auth_user)
+        elif kwargs['success']:
             return self.set_pipe_end(samples, current_time, auth_user)
         else:
             return redirect('message', message_text='状态错误，请重试！')
 
 
-class SequencingStepInfoView(TemplateView):
-    template_name = 'step_info_sequencing.html'
+class IndexInfoInputView(TemplateView):
+    step_name = 'lib_build'
+    template_name = 'step_infos/index_info.html'
 
     @staticmethod
     def get_samples(sample_id_list):
         return SampleInfo.objects.filter(id__in=sample_id_list)
 
     def get_context_data(self, **kwargs):
-        if 'sample_id' in kwargs:
-            return {'sample_list': self.get_samples([kwargs['sample_id']])}
+        context = super().get_context_data(**kwargs)
+        if kwargs['sample_id']:
+            context.update(sample_list=self.get_samples([kwargs['sample_id']]))
+        else:
+            context.update(sample_list=self.get_samples(self.request.session.get('sample_list')))
+        return context
 
     def get(self, request, *args, **kwargs):
-        if not check_permission(request, 'sequencing'):
+        if not check_permission(request, self.step_name):
             return redirect('message', message_text='你没有权限进行该操作')
-        if 'sample_id' in kwargs:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('home')
+        return super().get(request, *args, **kwargs)
 
-    def post(self, request):
-        if not check_permission(request, 'sequencing'):
+    def post(self, request, **kwargs):
+        if not check_permission(request, self.step_name):
             return redirect('message', message_text='你没有权限进行该操作')
-        set_pipe_info = request.POST.get('set_pipe_info', True)
-        if set_pipe_info == '0' or set_pipe_info == 0:
-            sample_id_list = request.POST.getlist('sample_list')
-            sample_list = self.get_samples(sample_id_list)
-            return self.render_to_response({'sample_list': sample_list})
-        else:
-            return self.set_index_seq(request)
+        return self.set_index_seq(request, **kwargs)
 
-    @staticmethod
-    def set_index_seq(request):
+    def set_index_seq(self, request, **kwargs):
         auth_user = get_auth_user(request)
+        current_time = datetime.datetime.now()
         index1_list = request.POST.getlist('index1_list')
         index2_list = request.POST.getlist('index2_list')
-        current_time = datetime.datetime.now()
         sample_id_list = request.POST.getlist('sample_list')
         for ind, sample_id in enumerate(sample_id_list):
             sample = get_object_or_None(SampleInfo, id=sample_id)
             if sample is None:
                 continue
-            sample_pipe = sample.sample_pipe
+            step = getattr(sample.sample_pipe, f'{self.step_name}_step')
             # 保存index序列
-            sequencing = SequencingStep()
-            sequencing.index1_seq = index1_list[ind]
-            sequencing.index2_seq = index2_list[ind]
-            sequencing.operator = auth_user
-            sequencing.begin = current_time
-            sequencing.save()
-            # 修改流程状态
-            sample_pipe.sequencing_step = sequencing
-            sample_pipe.status = 'sequencing'
-            sample_pipe.save()
-            # 修改样本状态
-            sample.sample_pipe = sample_pipe
-            sample.save()
+            step.end = current_time
+            step.index1_seq = index1_list[ind]
+            step.index2_seq = index2_list[ind]
+            if step.operator != auth_user:
+                return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
+            step.save()
+
         # 重定向到新的任务
-        return redirect('sample_pipe', step_name='sequencing', status='end')
+        return redirect('sample_pipe', step_name=self.step_name, status='begin')

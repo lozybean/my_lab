@@ -98,13 +98,13 @@
                         INDEX1：
                     </th>
                     <td>
-                        {{ sample.sample_pipe.sequencing_step.index1_seq|display_none:'' }}
+                        {{ sample.sample_pipe.lib_build_step.index1_seq|display_none:'' }}
                     </td>
                     <th>
                         INDEX2：
                     </th>
                     <td>
-                        {{ sample.sample_pipe.sequencing_step.index2_seq|display_none:'' }}
+                        {{ sample.sample_pipe.lib_build_step.index2_seq|display_none:'' }}
                     </td>
                 </tr>
             </table>
@@ -114,7 +114,7 @@
         <a href="{% url 'add_sample_info' pk=sample.id %}">
             <input type="button" value="修改样本信息" class="btn btn-danger">
         </a>
-        <a href="{% url 'sequencing_step_info' sample_id=sample.id %}">
+        <a href="{% url 'input_index_info' sample_id=sample.id %}">
             <input type="button" value="修改INDEX信息" class="btn btn-danger">
         </a>
     </p>

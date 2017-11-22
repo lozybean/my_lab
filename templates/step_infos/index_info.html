@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 {% load set_var %}
 {% block content %}
-    <form action="{% url 'sequencing_step_info' %}" method="POST">
+    <form action="{% url 'input_index_info' %}" method="POST">
         {% csrf_token %}
         <div class="panel panel-default">
             <div class="panel-heading text-center" id="sample_pipe_title">
