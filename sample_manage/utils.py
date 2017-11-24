@@ -111,7 +111,7 @@ def get_subject_from_lims(barcode: str):
     subject.age = get_age_num(lims_info['PTNT_AGE'])
     subject.diagnosis = lims_info_custom['病理诊断']
     subject.family_history = lims_info_custom['家族史']
-    subject.nationality = ''
+    subject.nationality = lims_info['NATION'].strip()
     return subject
 
 

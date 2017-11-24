@@ -68,8 +68,9 @@ class SubjectInfo(models.Model):
     gender = models.CharField(max_length=10, choices=(('male', '男'), ('female', '女')),
                               verbose_name='性别')
     age = models.IntegerField(blank=True, null=True, verbose_name='年龄')
-    nationality = models.CharField(max_length=20, default='汉族', verbose_name='名族')
-    native_place = models.CharField(max_length=10, verbose_name='籍贯')
+    nationality = models.CharField(max_length=20, default='汉族', verbose_name='名族',
+                                   blank=True)
+    native_place = models.CharField(max_length=10, verbose_name='籍贯', blank=True)
     diagnosis = models.TextField(blank=True, null=True, verbose_name='临床诊断')
     family_history = models.TextField(blank=True, null=True, verbose_name='家族史')
 
@@ -98,7 +99,7 @@ class DnaExtractStep(models.Model):
                                  verbose_name='操作人员')
 
     store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
-    pass_qc = models.BooleanField(default=False, verbose_name='通过质控')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
 
     def __str__(self):
         return f'操作人: {self.operator}'
@@ -114,7 +115,7 @@ class LibBuildStep(models.Model):
     index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
     index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
     store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
-    pass_qc = models.BooleanField(default=False, verbose_name='通过质控')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
 
     def __str__(self):
         return f'操作人: {self.operator}'
@@ -127,16 +128,34 @@ class QuantifyStep(models.Model):
                                  related_name='%(app_label)s_%(class)s_quantify',
                                  verbose_name='操作人员')
 
+    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
+
     def __str__(self):
         return f'操作人: {self.operator}'
 
 
 class SequencingStep(models.Model):
+    SEQUENCER = (('MiSeq-M03074', 'MiSeq-M03074'),
+                 ('MiSeq-M05418', 'MiSeq(研发)'),
+                 ('NextSeq-CN500', 'NextSeq-CN500'),
+                 ('NextSeq-NS500', 'NextSeq-NS500'),
+                 ('MiniSeq-MN00531', 'MiniSeq(邵逸夫)'),
+                 )
+
     begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
                                  related_name='%(app_label)s_%(class)s_dna_extract',
                                  verbose_name='操作人员')
+
+    index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
+    index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
+
+    sequencer = models.CharField(choices=SEQUENCER, blank=True,
+                                 null=True, verbose_name='测序仪器',
+                                 max_length=30)
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
 
     def __str__(self):
         return f'操作人: {self.operator}'
@@ -148,6 +167,10 @@ class BioinfoStep(models.Model):
     operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
                                  related_name='%(app_label)s_%(class)s_dna_extract',
                                  verbose_name='操作人员')
+
+    project_type = models.CharField(max_length=50, blank=True, null=True, verbose_name='使用流程')
+    result_path = models.CharField(max_length=200, blank=True, null=True, verbose_name='结果路径')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
 
     def __str__(self):
         return f'操作人: {self.operator}'

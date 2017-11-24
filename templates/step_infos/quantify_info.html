@@ -3,11 +3,11 @@
 {% load set_var %}
 {% load display_none %}
 {% block content %}
-    <form action="{% url 'dna_extract_info' %}" method="POST">
+    <form action="{% url 'quantify_info' %}" method="POST">
         {% csrf_token %}
         <div class="panel panel-default">
             <div class="panel-heading text-center" id="sample_pipe_title">
-                DNA提取信息
+                上机前定量信息
             </div>
             {% if message %}
                 <h4>
@@ -30,14 +30,14 @@
                         <th width="20%">
                             是否通过质控
                         </th>
-                        <th width="0%">
-
-                        </th>
+                        {#                        <th width="0%">#}
+                        {##}
+                        {#                        </th>#}
                     </tr>
                     </thead>
                     <tbody>
                     {% for sample in sample_list %}
-                        {% set step = sample.sample_pipe.dna_extract_step %}
+                        {% set step = sample.sample_pipe.quantify_step %}
                         <tr>
                             <td>
                                 <a href="{% url 'sample_info' sample_id=sample.id %}">
@@ -50,16 +50,16 @@
                                 </a>
                             </td>
                             <td>
-                                <input type="text" title name="store_place"
+                                <input type="text" title name="store_place_list"
                                        value="{{ step.store_place|display_none:'' }}">
                             </td>
                             <td>
-                                <input type="checkbox" title name="pass_qc" value="{{ step.pass_qc }}">
+                                <input type="checkbox" title name="pass_qc_list" value="{{ sample.id }}">
                             </td>
-                            <td>
-                                <input type="text" title readonly hidden name="sample_list" class="hidden"
-                                       value="{{ sample.id }}">
-                            </td>
+                            {#                            <td>#}
+                            {#                                <input type="text" title readonly hidden name="sample_list" class="hidden"#}
+                            {#                                       value="{{ sample.id }}">#}
+                            {#                            </td>#}
                         </tr>
                     {% endfor %}
                     </tbody>

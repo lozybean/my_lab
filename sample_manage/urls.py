@@ -30,6 +30,8 @@ urlpatterns = [
     url(r'^lib_build_info/(?P<sample_id>\d+)?$', views.LibBuildInfoView.as_view(), name='lib_build_info'),
     url(r'^dna_extract_info/(?P<sample_id>\d+)?$', views.DnaExtractInfoView.as_view(), name='dna_extract_info'),
     url(r'^quantify_info/(?P<sample_id>\d+)?$', views.QuantifyInfoView.as_view(), name='quantify_info'),
+    url(r'^sequencing_info/(?P<sample_id>\d+)?$', views.SequencingInfoView.as_view(), name='sequencing_info'),
+    url(r'^bioinfo_info/(?P<sample_id>\d+)?$', views.BioInfoInfoView.as_view(), name='bioinfo_info'),
 
     url(r'^add/sample_info/(?P<pk>\d+)?$', views.AddSampleInfoView.as_view(), name='add_sample_info'),
     url(r'^add/subject_info/(?P<pk>\d+)?$', views.AddSubjectInfoView.as_view(), name='add_subject_info'),

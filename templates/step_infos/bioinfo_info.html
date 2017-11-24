@@ -2,12 +2,13 @@
 {% load bootstrap3 %}
 {% load set_var %}
 {% load display_none %}
+{% load get_result_path %}
 {% block content %}
-    <form action="{% url 'dna_extract_info' %}" method="POST">
+    <form action="{% url 'bioinfo_info' %}" method="POST">
         {% csrf_token %}
         <div class="panel panel-default">
             <div class="panel-heading text-center" id="sample_pipe_title">
-                DNA提取信息
+                生信分析信息
             </div>
             {% if message %}
                 <h4>
@@ -18,26 +19,27 @@
                 <table class="table table-responsive">
                     <thead class="thead-default">
                     <tr>
-                        <th width="25%">
+                        <th width="15%">
                             样本名称
                         </th>
-                        <th width="25%">
+                        <th width="15%">
                             样本条码
                         </th>
-                        <th width="30%">
-                            存储位置
+                        <th width="15%">
+                            使用流程
+                        </th>
+                        <th width="35%">
+                            结果路径
                         </th>
                         <th width="20%">
                             是否通过质控
                         </th>
-                        {#                        <th width="0%">#}
-                        {##}
-                        {#                        </th>#}
                     </tr>
                     </thead>
                     <tbody>
                     {% for sample in sample_list %}
-                        {% set step = sample.sample_pipe.dna_extract_step %}
+                        {% set step = sample.sample_pipe.bioinfo_step %}
+                        {% set sequencing = sample.sample_pipe.sequencing_step %}
                         <tr>
                             <td>
                                 <a href="{% url 'sample_info' sample_id=sample.id %}">
@@ -50,17 +52,21 @@
                                 </a>
                             </td>
                             <td>
-                                <input type="text" title name="store_place_list"
-                                       value="{{ step.store_place|display_none:'' }}">
+                                <input type="text" title name="project_type_list" id="id_project_type"
+                                       value="{{ step.project_type|display_none:'' }}">
                             </td>
                             <td>
-                                <input type="checkbox" title name="pass_qc_list" value="{{ sample.id }}"
-                                       {% if step.pass_qc %}checked{% endif %}>
+                                {% if step.result_path %}
+                                    <input type="text" title name="result_path_list" id="id_result_path"
+                                           value="{{ step.result_path }}">
+                                {% else %}
+                                    <input type="text" title name="result_path_list" id="id_result_path"
+                                           value="{{ sequencing|get_result_path }}">
+                                {% endif %}
                             </td>
-                            {#                            <td>#}
-                            {#                                <input type="text" title readonly hidden name="sample_list" class="hidden"#}
-                            {#                                       value="{{ sample.id }}">#}
-                            {#                            </td>#}
+                            <td>
+                                <input type="checkbox" title name="pass_qc_list" value="{{ sample.id }}">
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

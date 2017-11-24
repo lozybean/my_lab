@@ -464,12 +464,12 @@ class SamplePipeView(TemplateView):
         if self.status == 'begin':
             return self.set_pipe_begin(samples, current_time, auth_user)
         elif self.status == 'end' and not kwargs['success']:
-            if self.step_name == 'dna_extract':
-                request.session['sample_list'] = sample_id_list
-                return redirect('dna_extract_info')
-            if self.step_name == 'lib_build':
-                request.session['sample_list'] = sample_id_list
-                return redirect('lib_build_info')
+            request.session['sample_list'] = sample_id_list
+            steps_with_info = ['dna_extract', 'lib_build', 'quantify', 'sequencing',
+                               'bioinfo']
+            if self.step_name in steps_with_info:
+                step_info_url_name = f'{self.step_name}_info'
+                return redirect(step_info_url_name)
             return self.set_pipe_end(samples, current_time, auth_user)
         elif kwargs['success']:
             return self.set_pipe_end(samples, current_time, auth_user)
@@ -477,7 +477,7 @@ class SamplePipeView(TemplateView):
             return redirect('message', message_text='状态错误，请重试！')
 
 
-class BaseSamplePipeView(TemplateView):
+class BaseSamplePipeInfoView(TemplateView):
     step_name = None
     template_name = None
 
@@ -507,7 +507,7 @@ class BaseSamplePipeView(TemplateView):
         raise NotImplementedError("must implement finish_step")
 
 
-class DnaExtractInfoView(BaseSamplePipeView):
+class DnaExtractInfoView(BaseSamplePipeInfoView):
     step_name = 'dna_extract'
     template_name = 'step_infos/dna_extract_info.html'
 
@@ -515,9 +515,8 @@ class DnaExtractInfoView(BaseSamplePipeView):
         auth_user = get_auth_user(request)
         current_time = datetime.datetime.now()
         store_place_list = request.POST.getlist('store_place_list')
-        pass_qc_list = request.POST.getlist('pass_qc_list')
-        sample_id_list = request.POST.getlist('sample_list')
-        for ind, sample_id in enumerate(sample_id_list):
+        pass_qc_sample_list = request.POST.getlist('pass_qc_list')
+        for ind, sample_id in enumerate(pass_qc_sample_list):
             sample = get_object_or_None(SampleInfo, id=sample_id)
             if sample is None:
                 continue
@@ -525,7 +524,7 @@ class DnaExtractInfoView(BaseSamplePipeView):
             # 保存index序列
             step.end = current_time
             step.store_place = store_place_list[ind]
-            step.pass_qc = pass_qc_list[ind]
+            step.pass_qc = True
             if step.operator != auth_user:
                 return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
             step.save()
@@ -534,34 +533,7 @@ class DnaExtractInfoView(BaseSamplePipeView):
         return redirect('sample_pipe', step_name=self.step_name, status='begin')
 
 
-class QuantifyInfoView(BaseSamplePipeView):
-    step_name = 'quantify'
-    template_name = 'step_infos/quantify_info.html'
-
-    def finish_step(self, request, **kwargs):
-        auth_user = get_auth_user(request)
-        current_time = datetime.datetime.now()
-        store_place_list = request.POST.getlist('store_place_list')
-        pass_qc_list = request.POST.getlist('pass_qc_list')
-        sample_id_list = request.POST.getlist('sample_list')
-        for ind, sample_id in enumerate(sample_id_list):
-            sample = get_object_or_None(SampleInfo, id=sample_id)
-            if sample is None:
-                continue
-            step = getattr(sample.sample_pipe, f'{self.step_name}_step')
-            # 保存index序列
-            step.end = current_time
-            step.store_place = store_place_list[ind]
-            step.pass_qc = pass_qc_list[ind]
-            if step.operator != auth_user:
-                return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
-            step.save()
-
-        # 重定向到新的任务
-        return redirect('sample_pipe', step_name=self.step_name, status='begin')
-
-
-class LibBuildInfoView(BaseSamplePipeView):
+class LibBuildInfoView(BaseSamplePipeInfoView):
     step_name = 'lib_build'
     template_name = 'step_infos/lib_build_info.html'
 
@@ -571,9 +543,8 @@ class LibBuildInfoView(BaseSamplePipeView):
         index1_list = request.POST.getlist('index1_list')
         index2_list = request.POST.getlist('index2_list')
         store_place_list = request.POST.getlist('store_place_list')
-        pass_qc_list = request.POST.getlist('pass_qc_list')
-        sample_id_list = request.POST.getlist('sample_list')
-        for ind, sample_id in enumerate(sample_id_list):
+        pass_qc_sample_list = request.POST.getlist('pass_qc_list')
+        for ind, sample_id in enumerate(pass_qc_sample_list):
             sample = get_object_or_None(SampleInfo, id=sample_id)
             if sample is None:
                 continue
@@ -583,10 +554,92 @@ class LibBuildInfoView(BaseSamplePipeView):
             step.index1_seq = index1_list[ind]
             step.index2_seq = index2_list[ind]
             step.store_place = store_place_list[ind]
-            step.pass_qc = pass_qc_list[ind]
+            step.pass_qc = True
             if step.operator != auth_user:
                 return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
             step.save()
 
+        # 重定向到新的任务
+        return redirect('sample_pipe', step_name=self.step_name, status='begin')
+
+
+class QuantifyInfoView(BaseSamplePipeInfoView):
+    step_name = 'quantify'
+    template_name = 'step_infos/quantify_info.html'
+
+    def finish_step(self, request, **kwargs):
+        auth_user = get_auth_user(request)
+        current_time = datetime.datetime.now()
+        store_place_list = request.POST.getlist('store_place_list')
+        pass_qc_sample_list = request.POST.getlist('pass_qc_list')
+        for ind, sample_id in enumerate(pass_qc_sample_list):
+            sample = get_object_or_None(SampleInfo, id=sample_id)
+            if sample is None:
+                continue
+            step = getattr(sample.sample_pipe, f'{self.step_name}_step')
+            # 保存index序列
+            step.end = current_time
+            step.store_place = store_place_list[ind]
+            step.pass_qc = True
+            if step.operator != auth_user:
+                return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
+            step.save()
+
+        # 重定向到新的任务
+        return redirect('sample_pipe', step_name=self.step_name, status='begin')
+
+
+class SequencingInfoView(BaseSamplePipeInfoView):
+    step_name = 'sequencing'
+    template_name = 'step_infos/sequencing_info.html'
+
+    def finish_step(self, request, **kwargs):
+        auth_user = get_auth_user(request)
+        current_time = datetime.datetime.now()
+        index1_list = request.POST.getlist('index1_list')
+        index2_list = request.POST.getlist('index2_list')
+        sequencer_list = request.POST.getlist('sequencer_list')
+        pass_qc_sample_list = request.POST.getlist('pass_qc_list')
+        for ind, sample_id in enumerate(pass_qc_sample_list):
+            sample = get_object_or_None(SampleInfo, id=sample_id)
+            if sample is None:
+                continue
+            step = getattr(sample.sample_pipe, f'{self.step_name}_step')
+            # 保存index序列
+            step.end = current_time
+            step.index1_seq = index1_list[ind]
+            step.index2_seq = index2_list[ind]
+            step.sequencer = sequencer_list[ind]
+            step.pass_qc = True
+            if step.operator != auth_user:
+                return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
+            step.save()
+        # 重定向到新的任务
+        return redirect('sample_pipe', step_name=self.step_name, status='begin')
+
+
+class BioInfoInfoView(BaseSamplePipeInfoView):
+    step_name = 'bioinfo'
+    template_name = 'step_infos/bioinfo_info.html'
+
+    def finish_step(self, request, **kwargs):
+        auth_user = get_auth_user(request)
+        current_time = datetime.datetime.now()
+        pass_qc_sample_list = request.POST.getlist('pass_qc_list')
+        project_type_list = request.POST.getlist('project_type_list')
+        result_path_list = request.POST.getlist('result_path_list')
+        for ind, sample_id in enumerate(pass_qc_sample_list):
+            sample = get_object_or_None(SampleInfo, id=sample_id)
+            if sample is None:
+                continue
+            step = getattr(sample.sample_pipe, f'{self.step_name}_step')
+            # 保存index序列
+            step.end = current_time
+            step.project_type = project_type_list[ind]
+            step.path_list = result_path_list[ind]
+            step.pass_qc = True
+            if step.operator != auth_user:
+                return redirect('message', message_text='操作人员不符合，请使用开始操作的账号登录')
+            step.save()
         # 重定向到新的任务
         return redirect('sample_pipe', step_name=self.step_name, status='begin')

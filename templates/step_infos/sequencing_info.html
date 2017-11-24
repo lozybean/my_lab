@@ -3,11 +3,11 @@
 {% load set_var %}
 {% load display_none %}
 {% block content %}
-    <form action="{% url 'lib_build_info' %}" method="POST">
+    <form action="{% url 'sequencing_info' %}" method="POST">
         {% csrf_token %}
         <div class="panel panel-default">
             <div class="panel-heading text-center" id="sample_pipe_title">
-                建库信息
+                上机信息，请确认INDEX并选择测序仪
             </div>
             {% if message %}
                 <h4>
@@ -31,19 +31,20 @@
                             INDEX2
                         </th>
                         <th width="20%">
-                            存储位置
+                            测序仪
                         </th>
                         <th width="20%">
                             是否通过质控
                         </th>
-                        {#                        <th width="0%">#}
-                        {##}
-                        {#                        </th>#}
+{#                        <th width="0%">#}
+{##}
+{#                        </th>#}
                     </tr>
                     </thead>
                     <tbody>
                     {% for sample in sample_list %}
-                        {% set step = sample.sample_pipe.lib_build_step %}
+                        {% set step = sample.sample_pipe.sequencing_step %}
+                        {% set lib_build = sample.sample_pipe.lib_build_step %}
                         <tr>
                             <td>
                                 <a href="{% url 'sample_info' sample_id=sample.id %}">
@@ -56,21 +57,36 @@
                                 </a>
                             </td>
                             <td>
-                                <input type="text" title required name="index1_list"
-                                       value="{{ step.index1_seq|display_none:'' }}">
+                                {% if step.index1_seq%}
+                                    <input type="text" title required name="index1_list"
+                                           value="{{ step.index1_seq|display_none:'' }}">
+                                {% else %}
+                                    <input type="text" title required name="index1_list"
+                                           value="{{ lib_build.index1_seq|display_none:'' }}">
+                                {% endif %}
                             </td>
                             <td>
-                                <input type="text" title name="index2_list"
-                                       value="{{ step.index2_seq|display_none:'' }}">
+                                {% if step.index2_seq %}
+                                    <input type="text" title name="index2_list"
+                                           value="{{ step.index2_seq|display_none:'' }}">
+                                {% else %}
+                                    <input type="text" title name="index2_list"
+                                           value="{{ lib_build.index2_seq|display_none:'' }}">
+                                {% endif %}
                             </td>
                             <td>
-                                <input type="text" title name="store_place_list"
-                                       value="{{ step.store_place|display_none:'' }}">
+                                <select name="sequencer_list" id="id_sequencer" title>
+                                    {% for sequencer in step.SEQUENCER %}
+                                        <option value="{{ sequencer.0 }}">
+                                            {{ sequencer.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </td>
                             <td>
                                 <input type="checkbox" title name="pass_qc_list" value="{{ sample.id }}">
                             </td>
-                            {#                            <td>#}
+{#                            <td>#}
                             {#                                <input type="text" title readonly hidden name="sample_list" class="hidden"#}
                             {#                                       value="{{ sample.id }}">#}
                             {#                            </td>#}
