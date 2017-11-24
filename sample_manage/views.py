@@ -85,7 +85,20 @@ class UserInfoView(TemplateView):
         user_profile = get_user_profile(request)
         if not user_profile:
             return redirect('login')
-        return super().get(request)
+        return super().get(request, *args, **kwargs)
+
+    def change_primary_task(self, primary_task):
+        user_profile = get_user_profile(self.request)
+        if not check_permission(self.request, primary_task):
+            return redirect('message', message_text='你没有权限进行该操作')
+        user_profile.primary_task = primary_task
+        user_profile.save()
+
+    def post(self, request, *args, **kwargs):
+        primary_task = self.request.POST.get('primary_task', None)
+        if primary_task is not None:
+            self.change_primary_task(primary_task)
+        return self.get(request, *args, **kwargs)
 
 
 class SampleInfoView(TemplateView):

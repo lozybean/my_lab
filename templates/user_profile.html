@@ -29,7 +29,26 @@
             </tr>
             <tr>
                 <th>主要任务：</th>
-                <td>{{ user_profile.get_primary_task_display }}</td>
+                <td>
+                    <form action="{% url 'user_info' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-inline">
+                            <select name="primary_task" id="id_primary_task" title class="form-control">
+                                <option value="{{ user_profile.primary_task }}">
+                                    {{ user_profile.get_primary_task_display }}
+                                </option>
+                                {% for task in user_profile.TASK_NAMES %}
+                                    {% if task.0 != user_profile.primary_task %}
+                                        <option value="{{ task.0 }}">
+                                            {{ task.1 }}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <input type="submit" class="btn btn-warning">
+                        </div>
+                    </form>
+                </td>
                 <th></th>
                 <td></td>
             </tr>
