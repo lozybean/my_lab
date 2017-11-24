@@ -209,7 +209,10 @@ class SamplePipe(models.Model):
 
     def get_status_display(self):
         status_name = dict(STATUS)[self.status]
-        step = getattr(self, f'{self.status}_step')
+        try:
+            step = getattr(self, f'{self.status}_step')
+        except AttributeError:
+            return status_name
         if step.begin and not step.end:
             return f'{status_name}:进行中'
         elif step.begin and step.end:

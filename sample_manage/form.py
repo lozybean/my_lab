@@ -99,7 +99,7 @@ class SampleInfoForm(forms.ModelForm):
     )
     date_deadline = forms.DateTimeField(
         label='报告截止时间',
-        required=True,
+        required=False,
         widget=DateTimeWidget(
             usel10n=True,
             bootstrap_version=3,

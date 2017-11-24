@@ -65,7 +65,8 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <input type="checkbox" title name="pass_qc_list" value="{{ sample.id }}">
+                                <input type="checkbox" title name="pass_qc_list" value="{{ sample.id }}"
+                                       {% if step.pass_qc %}checked{% endif %}>
                             </td>
                         </tr>
                     {% endfor %}
