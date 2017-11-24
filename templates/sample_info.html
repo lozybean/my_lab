@@ -36,7 +36,9 @@
                 <tr>
                     <th>受检者姓名：</th>
                     <td>
-                        {{ sample.subject.name }}
+                        <a href="{% url 'subject_info' subject_id=sample.subject.id %}">
+                            {{ sample.subject.name }}
+                        </a>
                     </td>
                     <th>样本状态：</th>
                     <td>{{ sample_pipe.get_status_display }}</td>
@@ -149,7 +151,12 @@
                 {% with sample_pipe|get_attr:step_name as step %}
                     <tr>
                         <th>
-                            {{ step_name|get_status }}
+                            {% url  step_name|slice:"-4"|add:'info' sample_id=sample.id as step_url %}
+                            {% if step_url %}
+                                <a href="{{ step_url }}">{{ step_name|get_status }}</a>
+                            {% else %}
+                                {{ step_name|get_status }}
+                            {% endif %}
                         </th>
                         <td>
                             {% if step.begin %}

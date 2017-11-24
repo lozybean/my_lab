@@ -207,6 +207,16 @@ class SamplePipe(models.Model):
 
     report_step = models.ForeignKey(ReportStep, blank=True, null=True, verbose_name='报告撰写')
 
+    def get_status_display(self):
+        status_name = dict(STATUS)[self.status]
+        step = getattr(self, f'{self.status}_step')
+        if step.begin and not step.end:
+            return f'{status_name}:进行中'
+        elif step.begin and step.end:
+            return f'{status_name}:已完成'
+        else:
+            return status_name
+
 
 class SampleInfo(models.Model):
     name = models.CharField(max_length=20, verbose_name='样本名称')
