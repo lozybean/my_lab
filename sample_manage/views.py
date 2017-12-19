@@ -265,7 +265,8 @@ class AddSampleInfoView(AddFormView):
             for attr_name, attr in sample_exists.__dict__.items():
                 if attr_name.startswith('_') or attr_name == 'id':
                     continue
-                setattr(sample_exists, attr_name, getattr(sample, attr_name))
+                if getattr(sample, attr_name) is not None:
+                    setattr(sample_exists, attr_name, getattr(sample, attr_name))
             sample_exists.save()
             return True
         return False
