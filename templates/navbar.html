@@ -11,10 +11,14 @@
 
             {% if user.userprofile.primary_task == 'sample_receive' %}
                 <li><a href="{% url 'add_sample_info' %}">样本录入</a></li>
-{#                <li><a href="{% url 'add_subject_info' %}">受检者信息录入</a></li>#}
-            {% elif user.is_authenticated %}
+                <li><a href="{% url 'sample_list' %}">所有样本</a></li>
+            {% elif user.is_authenticated and user.userprofile.primary_task %}
                 <li><a href="{% url 'task' status='begin' primary_task=user.userprofile.primary_task %}">新的任务</a></li>
                 <li><a href="{% url 'task' status='end' primary_task=user.userprofile.primary_task %}">进行中的任务</a></li>
+                <li><a href="{% url 'sample_list' %}">所有样本</a></li>
+            {% elif not user.userprofile.primary_task %}
+                <li><a href="{% url 'subject_list' %}">所有受检者</a></li>
+                <li><a href="{% url 'sample_list' %}">所有样本</a></li>
             {% else %}
                 <li><a href="{% url 'home' %}">欢迎使用NGS样本流程管理系统</a></li>
             {% endif %}

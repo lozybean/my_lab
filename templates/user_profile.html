@@ -5,9 +5,19 @@
 {% load get_attr %}
 {% block content %}
     {% set user_profile = user.userprofile %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <div class="panel panel-default">
 
-        <div class="panel-heading text-center">我的信息</div>
+        <div class="panel-heading text-center">
+            我的信息
+            <a href="{% url 'change_password' %}">修改密码</a>
+        </div>
 
         <table class="table table-responsive" id="sample_info_table">
             <col width="20%">

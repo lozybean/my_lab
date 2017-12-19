@@ -1,8 +1,10 @@
 import datetime
 
 from annoying.functions import get_object_or_None
-from django.contrib import auth
-from django.shortcuts import get_object_or_404, get_list_or_404, redirect
+from django.contrib import auth, messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
+from django.shortcuts import get_object_or_404, get_list_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.html import escape
 from django.views import generic
@@ -10,7 +12,7 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import FormView
 from django_addanother.views import CreatePopupMixin, UpdatePopupMixin
 from sample_manage import models
-from sample_manage.form import (LoginForm, SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm,
+from sample_manage.form import (SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm,
                                 FamilyInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType
 from sample_manage.utils import (get_auth_user, get_user_profile, check_permission,
@@ -32,36 +34,23 @@ class Home(AuthCheckView):
     def get(self, request):
         if self.is_auth(request):
             primary_task = get_primary_task(request)
-            return redirect('task', primary_task=primary_task, status='begin')
+            if not primary_task:
+                return render(request, 'home.html')
+            else:
+                return redirect('task', primary_task=primary_task, status='begin')
         else:
             return redirect('login')
 
 
 class LoginView(FormView):
-    form_class = LoginForm
+    form_class = AuthenticationForm
     template_name = 'login.html'
     success_url = reverse_lazy('home')
 
-    def get(self, request, *args, **kwargs):
-        form = self.form_class()
-        return self.render_to_response({'form': form})
-
-    def form_valid(self, form, request):
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-        user = auth.authenticate(username=username, password=password)
-        if user is not None and user.is_active:
-            auth.login(request, user)
-            return super().form_valid(form)
-        else:
-            return self.render_to_response({'form': form, 'password_is_wrong': True})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            return self.form_valid(form, request)
-        else:
-            return self.form_invalid(form)
+    def form_valid(self, form):
+        user = auth.authenticate(username=form.data['username'], password=form.data['password'])
+        auth.login(self.request, user)
+        return super().form_valid(form)
 
 
 class LogoutView(AuthCheckView):
@@ -69,6 +58,23 @@ class LogoutView(AuthCheckView):
         if self.is_auth(request):
             auth.logout(request)
         return redirect('login')
+
+
+class ChangePasswordView(FormView):
+    form_class = PasswordChangeForm
+    template_name = 'change_password.html'
+    success_url = reverse_lazy('user_info')
+
+    def form_valid(self, form):
+        user = form.save()
+        update_session_auth_hash(self.request, user)
+        messages.info(self.request, '密码修改成功！')
+        return redirect('user_info')
+
+    def get_form_kwargs(self):
+        kwargs = super(ChangePasswordView, self).get_form_kwargs()
+        kwargs.update(user=self.request.user)
+        return kwargs
 
 
 class MessageView(TemplateView):
