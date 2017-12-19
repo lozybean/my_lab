@@ -219,7 +219,7 @@ class AddFormView(FormView):
         return redirect('message', message_text=self.success_message)
 
     def form_invalid(self, form):
-        return redirect('message', message_text='录入失败')
+        return self.render_to_response({'form': form})
 
     def get(self, request, *args, **kwargs):
         if self.permission and not check_permission(request, self.permission):
@@ -255,6 +255,25 @@ class AddSampleInfoView(AddFormView):
         sample = form.instance
         sample.sample_pipe = sample_pipe
         return super().form_valid(form)
+
+    @staticmethod
+    def update_with_barcode(form):
+        sample = form.instance
+        barcode = sample.barcode
+        sample_exists = get_object_or_None(SampleInfo, barcode=barcode)
+        if sample_exists:
+            for attr_name, attr in sample_exists.__dict__.items():
+                if attr_name.startswith('_') or attr_name == 'id':
+                    continue
+                setattr(sample_exists, attr_name, getattr(sample, attr_name))
+            sample_exists.save()
+            return True
+        return False
+
+    def form_invalid(self, form):
+        if self.update_with_barcode(form):
+            return redirect('message', message_text=self.success_message)
+        return super(AddSampleInfoView, self).form_invalid(form)
 
 
 class AddSubjectInfoView(AddFormView):

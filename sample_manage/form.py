@@ -2,7 +2,6 @@ import datetime
 
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
-from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from sample_manage.models import (SampleInfo, SampleType, Project, SubjectInfo,
                                   FamilyInfo)
@@ -39,12 +38,11 @@ class LoginForm(forms.Form):
 
 
 class SampleInfoForm(forms.ModelForm):
-    def clean_barcode(self):
-        barcode = self.cleaned_data.get('barcode', '')
-        if SampleInfo.objects.filter(barcode=barcode).exists():
-            raise ValidationError("该样本条码已经存在，请核对或者修改已有样本！")
-        return barcode
-
+    # def clean_barcode(self):
+    #     barcode = self.cleaned_data.get('barcode', '')
+    #     if SampleInfo.objects.filter(barcode=barcode).exists():
+    #         raise ValidationError("该样本条码已经存在，请核对或者修改已有样本！")
+    #     return barcode
     type = forms.ModelChoiceField(
         label='样本类型',
         queryset=SampleType.objects,
