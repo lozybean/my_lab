@@ -95,20 +95,39 @@
                         {% endif %}
                     </td>
                 </tr>
-                <tr>
-                    <th>
-                        INDEX1：
-                    </th>
-                    <td>
-                        {{ sample.sample_pipe.lib_build_step.index1_seq|display_none:'' }}
-                    </td>
-                    <th>
-                        INDEX2：
-                    </th>
-                    <td>
-                        {{ sample.sample_pipe.lib_build_step.index2_seq|display_none:'' }}
-                    </td>
-                </tr>
+                {% if sample.sample_pipe.sequencing_step %}
+                    <tr>
+                        <th>
+                            INDEX1：
+                        </th>
+                        <td>
+
+                            {{ sample.sample_pipe.sequencing_step.index1_seq|display_none:'' }}
+                        </td>
+                        <th>
+                            INDEX2：
+                        </th>
+                        <td>
+                            {{ sample.sample_pipe.sequencing_step.index2_seq|display_none:'' }}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <th>
+                            INDEX1：
+                        </th>
+                        <td>
+
+                            {{ sample.sample_pipe.lib_build_step.index1_seq|display_none:'' }}
+                        </td>
+                        <th>
+                            INDEX2：
+                        </th>
+                        <td>
+                            {{ sample.sample_pipe.lib_build_step.index2_seq|display_none:'' }}
+                        </td>
+                    </tr>
+                {% endif %}
             </table>
         </div>
     </form>
