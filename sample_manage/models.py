@@ -20,6 +20,7 @@ class UserProfile(models.Model):
                    ('view_subject', '受检者信息查询'),
                    ('add_sample_type', '添加样本类型'),
                    ('add_project', '增加检测项目'),
+                   ('sample_delete', '样本删除'),
                    ] + list(TASK_NAMES)
     user = models.OneToOneField(User, verbose_name='用户名')
 
@@ -34,6 +35,7 @@ class UserProfile(models.Model):
     add_project = models.BooleanField(default=False, verbose_name='增加检测项目')
 
     sample_receive = models.BooleanField(default=False, verbose_name='样本接收')
+    sample_delete = models.BooleanField(default=False, verbose_name='样本删除')
 
     dna_extract = models.BooleanField(default=False, verbose_name='DNA提取')
     lib_build = models.BooleanField(default=False, verbose_name='文库构建')

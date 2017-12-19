@@ -186,4 +186,10 @@
 
         </table>
     </div>
+    <form action="{% url 'delete_sample' sample_id=sample.id %}" method="POST">
+        {% csrf_token %}
+        <p class="form-actions">
+            <input type="submit" value="删除该样本" class="btn btn-danger">
+        </p>
+    </form>
 {% endblock %}

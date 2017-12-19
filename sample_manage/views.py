@@ -128,6 +128,17 @@ class SampleInfoView(TemplateView):
         return self.render_to_response(context)
 
 
+class DeleteSampleView(View):
+    def post(self, request, sample_id):
+        if not check_permission(request, 'sample_delete'):
+            return redirect('message', message_text='你没有权限进行该操作')
+        sample = get_object_or_None(SampleInfo, id=sample_id)
+        sample_pipe = sample.sample_pipe
+        sample_pipe.delete()
+        sample.delete()
+        return redirect('home')
+
+
 class SampleListView(TemplateView):
     template_name = 'sample_list.html'
     query_type = None
