@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '&-gm0wwx4-g$nnhl9*m3x$)))m-m$_pdq811p4*!z-tv**q$bq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', '172.30.184.31']
 
@@ -76,18 +76,18 @@ WSGI_APPLICATION = 'my_lab.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
     # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'mylab',
-    #     'USER': 'liangzb',
-    #     'PASSWORD': 'lzb',
-    #     'HOST': '172.30.184.31',
-    #     'PORT': '3306',
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mylab',
+        'USER': 'liangzb',
+        'PASSWORD': 'lzb',
+        'HOST': '172.30.184.31',
+        'PORT': '3306',
+    }
 }
 
 # Password validation
@@ -125,11 +125,11 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    # os.path.join(STATIC_ROOT, 'css'),
-    # os.path.join(STATIC_ROOT, 'js'),
+    # os.path.join(BASE_DIR, "static"),
+    os.path.join(STATIC_ROOT, 'css'),
+    os.path.join(STATIC_ROOT, 'js'),
 ]
 
 # Default settings
