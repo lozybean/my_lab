@@ -4,6 +4,7 @@ from datetime import datetime
 import simplejson as json
 from annoying.functions import get_object_or_None
 from django.contrib import auth
+from django.shortcuts import _get_queryset
 from lxml import objectify
 from sample_manage.form import SubjectInfoForm
 from sample_manage.models import UserProfile, SamplePipe, SampleInfo, SampleType, Project
@@ -153,3 +154,17 @@ def get_step_names(step_name):
     else:
         previous_step_name = None
     return previous_step_name, current_step_name
+
+
+def get_list_or_empty(klass, *args, **kwargs):
+    queryset = _get_queryset(klass)
+    try:
+        return queryset.get(*args, **kwargs)
+    except AttributeError:
+        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        raise ValueError(
+            "First argument to get_object_or_empty() must be a Model, Manager, "
+            "or QuerySet, not '%s'." % klass__name
+        )
+    except queryset.model.DoesNotExist:
+        return []

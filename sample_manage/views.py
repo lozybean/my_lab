@@ -4,20 +4,19 @@ from annoying.functions import get_object_or_None
 from django.contrib import auth, messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
-from django.shortcuts import get_object_or_404, get_list_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.html import escape
 from django.views import generic
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import FormView
 from django_addanother.views import CreatePopupMixin, UpdatePopupMixin
-from sample_manage import models
 from sample_manage.form import (SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm,
                                 FamilyInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType
 from sample_manage.utils import (get_auth_user, get_user_profile, check_permission,
                                  get_primary_task, get_step_names, get_sample_from_lims,
-                                 get_subject_from_lims)
+                                 get_subject_from_lims, get_list_or_empty)
 
 
 # Create your views here.
@@ -143,24 +142,24 @@ class SampleListView(TemplateView):
 
     @staticmethod
     def get_sample_list_by_project(project_id):
-        return {'sample_list': get_list_or_404(SampleInfo, project__id=project_id)}
+        return {'sample_list': get_list_or_empty(SampleInfo, project__id=project_id)}
 
     @staticmethod
     def get_sample_list_by_status(status):
-        return {'sample_list': get_list_or_404(SampleInfo, sample_pipe__status=status)}
+        return {'sample_list': get_list_or_empty(SampleInfo, sample_pipe__status=status)}
 
     @staticmethod
     def get_sample_list_by_date(step, year, month, day, status=None):
         query_date = datetime.date(int(year), int(month), int(day))
         if step == 'sample_receive':
             kwargs = {
-                f'date_receive__date': query_date
+                f"date_receive__date": query_date
             }
         else:
             kwargs = {
-                f'sample_pipe__{step.lower()}__{status}__date': query_date
+                f"sample_pipe__{step.lower().replace('_', '')}__{status}__date": query_date
             }
-        return {'sample_list': get_list_or_404(SampleInfo, **kwargs)}
+        return {'sample_list': get_list_or_empty(SampleInfo, **kwargs)}
 
     def get_context_data(self, **kwargs):
         if self.query_type == 'project':
@@ -170,7 +169,7 @@ class SampleListView(TemplateView):
         if self.query_type == 'date':
             return self.get_sample_list_by_date(kwargs['step'], kwargs['year'], kwargs['month'],
                                                 kwargs['day'], kwargs['status'])
-        return {'sample_list': get_list_or_404(SampleInfo)}
+        return {'sample_list': get_list_or_empty(SampleInfo)}
 
 
 class SubjectInfoView(TemplateView):
@@ -196,7 +195,7 @@ class SubjectListView(TemplateView):
     template_name = 'subject_list.html'
 
     def get_context_data(self, **kwargs):
-        subject_list = get_list_or_404(SubjectInfo)
+        subject_list = get_list_or_empty(SubjectInfo)
         return {'subject_list': subject_list}
 
 
@@ -408,10 +407,10 @@ class SamplePipeView(TemplateView):
     def get_context_begin(step_name):
         previous_step_name, current_step_name = get_step_names(step_name)
         kwargs = {
-            f'sample_pipe__{current_step_name}__begin__isnull': True,
+            f"sample_pipe__{current_step_name.lower().replace('_','')}__begin__isnull": True,
         }
         if previous_step_name:
-            kwargs[f'sample_pipe__{previous_step_name}__end__isnull'] = False
+            kwargs[f"sample_pipe__{previous_step_name.lower().replace('_','')}__end__isnull"] = False
         samples = SampleInfo.objects.filter(**kwargs)
         if samples:
             return {'sample_list': samples, 'step_name': step_name, 'status': 'begin'}
@@ -423,8 +422,8 @@ class SamplePipeView(TemplateView):
     def get_context_end(step_name):
         previous_step_name, current_step_name = get_step_names(step_name)
         kwargs = {
-            f'sample_pipe__{current_step_name}__begin__isnull': False,
-            f'sample_pipe__{current_step_name}__end__isnull': True,
+            f"sample_pipe__{current_step_name.lower().replace('_','')}__begin__isnull": False,
+            f"sample_pipe__{current_step_name.lower().replace('_','')}__end__isnull": True,
         }
         samples = SampleInfo.objects.filter(**kwargs)
         if samples:
@@ -457,22 +456,14 @@ class SamplePipeView(TemplateView):
         for sample in samples:
             sample_pipe = sample.sample_pipe
             step = getattr(sample_pipe, current_step_name)
-            if step is None:
-                # 步骤尚未开始
-                step_model_name = current_step_name.title().replace('_', '')
-                step_model = getattr(models, step_model_name)
-                step = step_model()
             # 修改步骤状态
             step.begin = current_time
             step.operator = auth_user
+            step.sample_pipe = sample_pipe
             step.save()
             # 修改流程状态
-            setattr(sample_pipe, current_step_name, step)
             sample_pipe.status = self.step_name
             sample_pipe.save()
-            # 修改样本状态
-            sample.sample_pipe = sample_pipe
-            sample.save()
         # 重定向到任务中样本
         return redirect('sample_pipe', step_name=self.step_name, status='end')
 
