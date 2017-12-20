@@ -491,7 +491,7 @@ class SamplePipeView(TemplateView):
         samples = SampleInfo.objects.filter(id__in=sample_id_list)
         if self.status == 'begin':
             return self.set_pipe_begin(samples, current_time, auth_user)
-        elif self.status == 'end' and not kwargs['success']:
+        elif self.status == 'end':
             request.session['sample_list'] = sample_id_list
             steps_with_info = ['dna_extract', 'lib_build', 'quantify', 'sequencing',
                                'bioinfo']

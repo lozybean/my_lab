@@ -25,8 +25,7 @@ urlpatterns = [
     url(r'^subject_info/(?P<subject_id>\d+)$', views.SubjectInfoView.as_view(), name='subject_info'),
     url(r'^subject_list/$', views.SubjectListView.as_view(), name='subject_list'),
 
-    url(r'^sample_pipe/(?P<step_name>\w+)/(?P<status>\w+)/(?P<success>\d)?$',
-        views.SamplePipeView.as_view(), name='sample_pipe'),
+    url(r'^sample_pipe/(?P<step_name>\w+)/(?P<status>\w+)$', views.SamplePipeView.as_view(), name='sample_pipe'),
     url(r'^task/(?P<primary_task>\w+)/(?P<status>\w+)/$', views.TaskView.as_view(), name='task'),
 
     url(r'^lib_build_info/(?P<sample_id>\d+)?$', views.LibBuildInfoView.as_view(), name='lib_build_info'),

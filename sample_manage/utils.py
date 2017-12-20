@@ -159,12 +159,13 @@ def get_step_names(step_name):
 def get_list_or_empty(klass, *args, **kwargs):
     queryset = _get_queryset(klass)
     try:
-        return queryset.get(*args, **kwargs)
+        obj_list = list(queryset.filter(*args, **kwargs))
     except AttributeError:
         klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
         raise ValueError(
-            "First argument to get_object_or_empty() must be a Model, Manager, "
-            "or QuerySet, not '%s'." % klass__name
+            "First argument to get_list_or_empty() must be a Model, Manager, or "
+            "QuerySet, not '%s'." % klass__name
         )
-    except queryset.model.DoesNotExist:
+    if not obj_list:
         return []
+    return obj_list
