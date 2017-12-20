@@ -78,11 +78,12 @@
                 </div>
                 <p class="form-actions">
                     {% if status == 'begin' %}
-                        <input type="submit" value="开始" class="btn btn-primary">
+                        <input type="submit" value="开始" class="btn btn-primary" name="submit">
                     {% else %}
-                        <input type="submit" value="完成" class="btn btn-primary">
+                        <input type="submit" value="完成" class="btn btn-primary" name="submit">
                     {% endif %}
-                    <a href="#"><input type="button" value="退回" class="btn btn-danger"></a>
+                    {# 待完善 #}
+                    <button type="button" value="back" class="btn btn-danger" name="submit">退回</button>
                 </p>
             {% endif %}
         <input type="text" name="set_pipe_info" value=0 title hidden>

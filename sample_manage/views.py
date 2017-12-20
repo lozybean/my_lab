@@ -11,6 +11,7 @@ from django.views import generic
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import FormView
 from django_addanother.views import CreatePopupMixin, UpdatePopupMixin
+from sample_manage import models
 from sample_manage.form import (SampleInfoForm, SubjectInfoForm, SampleTypeForm, ProjectForm,
                                 FamilyInfoForm)
 from sample_manage.models import SampleInfo, SubjectInfo, SamplePipe, Project, SampleType
@@ -269,7 +270,6 @@ class AddSampleInfoView(AddFormView):
         sample_pipe.status = 'sample_receive'
         sample_pipe.sample = sample
         sample_pipe.save()
-        sample_pipe.set_steps()
         return super().form_valid(form)
 
     @staticmethod
@@ -456,6 +456,11 @@ class SamplePipeView(TemplateView):
         for sample in samples:
             sample_pipe = sample.sample_pipe
             step = getattr(sample_pipe, current_step_name)
+            if step is None:
+                # 步骤尚未开始
+                step_model_name = current_step_name.title().replace('_', '')
+                step_model = getattr(models, step_model_name)
+                step = step_model()
             # 修改步骤状态
             step.begin = current_time
             step.operator = auth_user
@@ -480,6 +485,17 @@ class SamplePipeView(TemplateView):
         # 重定向到新的任务
         return redirect('sample_pipe', step_name=self.step_name, status='begin')
 
+    def set_pipe_back(self, samples, auth_user):
+        previous_step_name, current_step_name = get_step_names(self.step_name)
+        print(previous_step_name, current_step_name)
+        for sample in samples:
+            sample_pipe = sample.sample_pipe
+            step = getattr(sample_pipe, current_step_name)
+            previous_step = getattr(sample_pipe, previous_step_name, None)
+            new_step = step.__class__()
+
+        return redirect('sample_pipe', step_name=self.step_name, status='begin')
+
     def post(self, request, *args, step_name=None, status=None, **kwargs):
         if not check_permission(request, step_name):
             return redirect('message', message_text='你没有权限进行该操作')
@@ -490,16 +506,19 @@ class SamplePipeView(TemplateView):
         sample_id_list = request.POST.getlist('sample_list')
         samples = SampleInfo.objects.filter(id__in=sample_id_list)
         if self.status == 'begin':
-            return self.set_pipe_begin(samples, current_time, auth_user)
+            if 'back' in self.request.POST['submit']:
+                return self.set_pipe_back(samples, auth_user)
+            else:
+                return self.set_pipe_begin(samples, current_time, auth_user)
         elif self.status == 'end':
+            if 'back' in self.request.POST['submit']:
+                return self.set_pipe_back(samples, auth_user)
             request.session['sample_list'] = sample_id_list
             steps_with_info = ['dna_extract', 'lib_build', 'quantify', 'sequencing',
                                'bioinfo']
             if self.step_name in steps_with_info:
                 step_info_url_name = f'{self.step_name}_info'
                 return redirect(step_info_url_name)
-            return self.set_pipe_end(samples, current_time, auth_user)
-        elif kwargs['success']:
             return self.set_pipe_end(samples, current_time, auth_user)
         else:
             return redirect('message', message_text='状态错误，请重试！')
