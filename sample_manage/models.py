@@ -22,7 +22,7 @@ class UserProfile(models.Model):
                    ('add_project', '增加检测项目'),
                    ('sample_delete', '样本删除'),
                    ] + list(TASK_NAMES)
-    user = models.OneToOneField(User, verbose_name='用户名')
+    user = models.OneToOneField(User, verbose_name='用户名', on_delete=models.CASCADE)
 
     primary_task = models.CharField(blank=True, max_length=30,
                                     choices=TASK_NAMES, verbose_name='主要任务')
@@ -93,136 +93,6 @@ class SampleType(models.Model):
         return self.type
 
 
-class DnaExtractStep(models.Model):
-    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
-    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                 related_name='%(app_label)s_%(class)s_dna_extract',
-                                 verbose_name='操作人员')
-
-    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
-    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
-
-    def __str__(self):
-        return f'操作人: {self.operator}'
-
-
-class LibBuildStep(models.Model):
-    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
-    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                 related_name='%(app_label)s_%(class)s_dna_extract',
-                                 verbose_name='操作人员')
-
-    index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
-    index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
-    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
-    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
-
-    def __str__(self):
-        return f'操作人: {self.operator}'
-
-
-class QuantifyStep(models.Model):
-    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
-    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                 related_name='%(app_label)s_%(class)s_quantify',
-                                 verbose_name='操作人员')
-
-    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
-    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
-
-    def __str__(self):
-        return f'操作人: {self.operator}'
-
-
-class SequencingStep(models.Model):
-    SEQUENCER = (('MiSeq-M03074', 'MiSeq-M03074'),
-                 ('MiSeq-M05418', 'MiSeq(研发)'),
-                 ('NextSeq-CN500', 'NextSeq-CN500'),
-                 ('NextSeq-NS500', 'NextSeq-NS500'),
-                 ('MiniSeq-MN00531', 'MiniSeq(邵逸夫)'),
-                 )
-
-    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
-    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                 related_name='%(app_label)s_%(class)s_dna_extract',
-                                 verbose_name='操作人员')
-
-    index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
-    index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
-
-    sequencer = models.CharField(choices=SEQUENCER, blank=True,
-                                 null=True, verbose_name='测序仪器',
-                                 max_length=30)
-    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
-
-    def __str__(self):
-        return f'操作人: {self.operator}'
-
-
-class BioinfoStep(models.Model):
-    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
-    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                 related_name='%(app_label)s_%(class)s_dna_extract',
-                                 verbose_name='操作人员')
-
-    project_type = models.CharField(max_length=50, blank=True, null=True, verbose_name='使用流程')
-    result_path = models.CharField(max_length=200, blank=True, null=True, verbose_name='结果路径')
-    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
-
-    def __str__(self):
-        return f'操作人: {self.operator}'
-
-
-class ReportStep(models.Model):
-    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
-    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
-    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
-                                 related_name='%(app_label)s_%(class)s_dna_extract',
-                                 verbose_name='操作人员')
-
-    def __str__(self):
-        return f'操作人: {self.operator}'
-
-
-class SamplePipe(models.Model):
-    STATUS = STATUS
-
-    # 实际操作的步骤
-    STEPS = [f'{i[0]}_step' for i in STATUS][1:-1]
-
-    status = models.CharField(max_length=30, choices=STATUS, verbose_name='当前状态')
-
-    dna_extract_step = models.ForeignKey(DnaExtractStep, blank=True, null=True, verbose_name='DNA提取')
-
-    lib_build_step = models.ForeignKey(LibBuildStep, blank=True, null=True, verbose_name='文库构建')
-
-    quantify_step = models.ForeignKey(QuantifyStep, blank=True, null=True, verbose_name='上机前定量')
-
-    sequencing_step = models.ForeignKey(SequencingStep, blank=True, null=True, verbose_name='上机测序')
-
-    bioinfo_step = models.ForeignKey(BioinfoStep, blank=True, null=True, verbose_name='生信分析')
-
-    report_step = models.ForeignKey(ReportStep, blank=True, null=True, verbose_name='报告撰写')
-
-    def get_status_display(self):
-        status_name = dict(STATUS)[self.status]
-        try:
-            step = getattr(self, f'{self.status}_step')
-        except AttributeError:
-            return status_name
-        if step.begin and not step.end:
-            return f'{status_name}:进行中'
-        elif step.begin and step.end:
-            return f'{status_name}:已完成'
-        else:
-            return status_name
-
-
 class SampleInfo(models.Model):
     name = models.CharField(max_length=20, verbose_name='样本名称')
     barcode = models.CharField(max_length=50, unique=True, verbose_name='样本条码号')
@@ -243,10 +113,193 @@ class SampleInfo(models.Model):
     has_request_note = models.BooleanField(default=True, verbose_name='是否有检测申请单')
     has_informed_note = models.BooleanField(default=True, verbose_name='是否有知情同意书')
 
-    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, verbose_name='样本流程')
-
     class Meta:
         ordering = ['-date_receive']
 
     def __str__(self):
         return f'{self.barcode}({self.name})'
+
+
+class SamplePipe(models.Model):
+    STATUS = STATUS
+    sample = models.OneToOneField(SampleInfo, verbose_name='样本信息', on_delete=models.CASCADE,
+                                  related_name='sample_pipe')
+
+    # 实际操作的步骤
+    STEPS = [f'{i[0]}_step' for i in STATUS][1:-1]
+
+    status = models.CharField(max_length=30, choices=STATUS, verbose_name='当前状态')
+
+    def set_steps(self):
+        step_classes = [DnaExtractStep, LibBuildStep, QuantifyStep,
+                        SequencingStep, BioinfoStep, ReportStep]
+        for step_class in step_classes:
+            step = step_class()
+            step.sample_pipe = self
+            step.save()
+
+    def get_status_display(self):
+        status_name = dict(STATUS)[self.status]
+        try:
+            step = getattr(self, f'{self.status}_step')
+        except AttributeError:
+            return status_name
+        if step.begin and not step.end:
+            return f'{status_name}:进行中'
+        elif step.begin and step.end:
+            return f'{status_name}:已完成'
+        else:
+            return status_name
+
+    @property
+    def dna_extract_step(self):
+        return self.dnaextractstep_set.first()
+
+    @property
+    def lib_build_step(self):
+        return self.libbuildstep_set.first()
+
+    @property
+    def quantify_step(self):
+        return self.quantifystep_set.first()
+
+    @property
+    def sequencing_step(self):
+        return self.sequencingstep_set.first()
+
+    @property
+    def bioinfo_step(self):
+        return self.bioinfostep_set.first()
+
+    @property
+    def report_step(self):
+        return self.reportstep_set.first()
+
+    def __str__(self):
+        return f"<SamplePipe: {self.sample.name}>"
+
+
+class DnaExtractStep(models.Model):
+    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
+    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract',
+                                 verbose_name='操作人员')
+
+    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+    class Meta:
+        ordering = ['-begin', '-end']
+
+
+class LibBuildStep(models.Model):
+    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
+    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract',
+                                 verbose_name='操作人员')
+
+    index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
+    index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
+    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+    class Meta:
+        ordering = ['-begin', '-end']
+
+
+class QuantifyStep(models.Model):
+    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
+    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_quantify',
+                                 verbose_name='操作人员')
+
+    store_place = models.CharField(max_length=50, blank=True, null=True, verbose_name='存储位置')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+    class Meta:
+        ordering = ['-begin', '-end']
+
+
+class SequencingStep(models.Model):
+    SEQUENCER = (('MiSeq-M03074', 'MiSeq-M03074'),
+                 ('MiSeq-M05418', 'MiSeq(研发)'),
+                 ('NextSeq-CN500', 'NextSeq-CN500'),
+                 ('NextSeq-NS500', 'NextSeq-NS500'),
+                 ('MiniSeq-MN00531', 'MiniSeq(邵逸夫)'),
+                 )
+
+    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
+    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract',
+                                 verbose_name='操作人员')
+
+    index1_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX1')
+    index2_seq = models.CharField(max_length=20, blank=True, null=True, verbose_name='INDEX2')
+
+    sequencer = models.CharField(choices=SEQUENCER, blank=True,
+                                 null=True, verbose_name='测序仪器',
+                                 max_length=30)
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+    class Meta:
+        ordering = ['-begin', '-end']
+
+
+class BioinfoStep(models.Model):
+    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
+    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract',
+                                 verbose_name='操作人员')
+
+    project_type = models.CharField(max_length=50, blank=True, null=True, verbose_name='使用流程')
+    result_path = models.CharField(max_length=200, blank=True, null=True, verbose_name='结果路径')
+    pass_qc = models.BooleanField(default=True, verbose_name='通过质控')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+    class Meta:
+        ordering = ['-begin', '-end']
+
+
+class ReportStep(models.Model):
+    sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+
+    begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
+    end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                                 related_name='%(app_label)s_%(class)s_dna_extract',
+                                 verbose_name='操作人员')
+
+    def __str__(self):
+        return f'操作人: {self.operator}'
+
+    class Meta:
+        ordering = ['-begin', '-end']

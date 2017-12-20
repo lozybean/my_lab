@@ -133,8 +133,6 @@ class DeleteSampleView(View):
         if not check_permission(request, 'sample_delete'):
             return redirect('message', message_text='你没有权限进行该操作')
         sample = get_object_or_None(SampleInfo, id=sample_id)
-        sample_pipe = sample.sample_pipe
-        sample_pipe.delete()
         sample.delete()
         return redirect('home')
 
@@ -266,11 +264,13 @@ class AddSampleInfoView(AddFormView):
         return context
 
     def form_valid(self, form):
+        sample = form.instance
+        sample.save()
         sample_pipe = SamplePipe()
         sample_pipe.status = 'sample_receive'
+        sample_pipe.sample = sample
         sample_pipe.save()
-        sample = form.instance
-        sample.sample_pipe = sample_pipe
+        sample_pipe.set_steps()
         return super().form_valid(form)
 
     @staticmethod
