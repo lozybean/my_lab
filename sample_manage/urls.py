@@ -7,7 +7,7 @@ urlpatterns = [
     url(r'^logout/$', views.LogoutView.as_view(), name='logout'),
     url(r'^user_info/$', views.UserInfoView.as_view(), name='user_info'),
     url(r'^password/$', views.ChangePasswordView.as_view(), name='change_password'),
-    url(r'^message/(?P<message_text>[\w《》，。？：！…—]+)/$', views.MessageView.as_view(), name='message'),
+    url(r'^message/(?P<message_text>.+)/$', views.MessageView.as_view(), name='message'),
 
     url(r'^sample_info/(?P<sample_id>\d+)/$', views.SampleInfoView.as_view(), name='sample_info'),
     url(r'^delete_sample/(?P<sample_id>\d+)/$', views.DeleteSampleView.as_view(), name='delete_sample'),

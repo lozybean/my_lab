@@ -131,12 +131,12 @@ class SamplePipe(models.Model):
     status = models.CharField(max_length=30, choices=STATUS, verbose_name='当前状态')
 
     def set_steps(self):
-        step_classes = [DnaExtractStep, LibBuildStep, QuantifyStep,
-                        SequencingStep, BioinfoStep, ReportStep]
-        for step_class in step_classes:
-            step = step_class()
-            step.sample_pipe = self
-            step.save()
+        """
+        make sure every step has an initial active step
+        :return:
+        """
+        for step_name in self.STEPS:
+            getattr(self, step_name)
 
     def get_status_display(self):
         status_name = dict(STATUS)[self.status]
@@ -152,27 +152,57 @@ class SamplePipe(models.Model):
 
     @property
     def dna_extract_step(self):
-        return self.dnaextractstep_set.first()
+        first_active = self.dnaextractstep_set.filter(active=True).first()
+        if not first_active:
+            first_active = DnaExtractStep()
+            first_active.sample_pipe = self
+            first_active.save()
+        return first_active
 
     @property
     def lib_build_step(self):
-        return self.libbuildstep_set.first()
+        first_active = self.libbuildstep_set.filter(active=True).first()
+        if not first_active:
+            first_active = LibBuildStep()
+            first_active.sample_pipe = self
+            first_active.save()
+        return first_active
 
     @property
     def quantify_step(self):
-        return self.quantifystep_set.first()
+        first_active = self.quantifystep_set.filter(active=True).first()
+        if not first_active:
+            first_active = QuantifyStep()
+            first_active.sample_pipe = self
+            first_active.save()
+        return first_active
 
     @property
     def sequencing_step(self):
-        return self.sequencingstep_set.first()
+        first_active = self.sequencingstep_set.filter(active=True).first()
+        if not first_active:
+            first_active = SequencingStep()
+            first_active.sample_pipe = self
+            first_active.save()
+        return first_active
 
     @property
     def bioinfo_step(self):
-        return self.bioinfostep_set.first()
+        first_active = self.bioinfostep_set.filter(active=True).first()
+        if not first_active:
+            first_active = BioinfoStep()
+            first_active.sample_pipe = self
+            first_active.save()
+        return first_active
 
     @property
     def report_step(self):
-        return self.reportstep_set.first()
+        first_active = self.reportstep_set.filter(active=True).first()
+        if not first_active:
+            first_active = ReportStep()
+            first_active.sample_pipe = self
+            first_active.save()
+        return first_active
 
     def __str__(self):
         return f"<SamplePipe: {self.sample.name}>"
@@ -180,6 +210,7 @@ class SamplePipe(models.Model):
 
 class DnaExtractStep(models.Model):
     sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True, verbose_name='活动状态')
 
     begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
@@ -199,6 +230,7 @@ class DnaExtractStep(models.Model):
 
 class LibBuildStep(models.Model):
     sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True, verbose_name='活动状态')
 
     begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
@@ -220,6 +252,7 @@ class LibBuildStep(models.Model):
 
 class QuantifyStep(models.Model):
     sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True, verbose_name='活动状态')
 
     begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
@@ -246,6 +279,7 @@ class SequencingStep(models.Model):
                  )
 
     sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True, verbose_name='活动状态')
 
     begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
@@ -270,6 +304,7 @@ class SequencingStep(models.Model):
 
 class BioinfoStep(models.Model):
     sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True, verbose_name='活动状态')
 
     begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')
@@ -290,6 +325,7 @@ class BioinfoStep(models.Model):
 
 class ReportStep(models.Model):
     sample_pipe = models.ForeignKey(SamplePipe, blank=True, null=True, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True, verbose_name='活动状态')
 
     begin = models.DateTimeField(blank=True, null=True, verbose_name='开始时间')
     end = models.DateTimeField(blank=True, null=True, verbose_name='结束时间')

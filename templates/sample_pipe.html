@@ -7,6 +7,13 @@
     <form action="{% url 'sample_pipe' step_name=step_name status=status %}" method="POST">
         {% csrf_token %}
         <div class="panel panel-default">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             {% if status == 'begin' %}
                 <div class="panel-heading text-center" id="sample_pipe_title">
                     需要<b>{{ step_name|get_status }}</b>的样本
@@ -83,7 +90,7 @@
                         <input type="submit" value="完成" class="btn btn-primary" name="submit">
                     {% endif %}
                     {# 待完善 #}
-                    <button type="button" value="back" class="btn btn-danger" name="submit">退回</button>
+                    <button type="submit" value="back" class="btn btn-danger" name="submit">退回</button>
                 </p>
             {% endif %}
         <input type="text" name="set_pipe_info" value=0 title hidden>

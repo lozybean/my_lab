@@ -3,7 +3,6 @@ from datetime import datetime
 
 import simplejson as json
 from annoying.functions import get_object_or_None
-from django.contrib import auth
 from django.shortcuts import _get_queryset
 from lxml import objectify
 from sample_manage.form import SubjectInfoForm
@@ -116,16 +115,8 @@ def get_subject_from_lims(barcode: str):
     return subject
 
 
-def get_auth_user(request):
-    if request.user.is_authenticated():
-        auth_user = auth.get_user(request)
-    else:
-        auth_user = False
-    return auth_user
-
-
 def get_user_profile(request):
-    user = get_auth_user(request)
+    user = request.user
     if not user:
         return False
     return UserProfile.objects.filter(user=user).first()

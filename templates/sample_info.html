@@ -196,7 +196,11 @@
                             {% endif %}
                         </td>
                         <td>
-                            {{ step.operator.get_full_name|display_none:'无' }}
+                            {% if step.operator.get_full_name %}
+                                {{ step.operator.get_full_name }}
+                            {% else %}
+                                {{ step.operator.get_username }}
+                            {% endif %}
                         </td>
                     </tr>
                 {% endwith %}
