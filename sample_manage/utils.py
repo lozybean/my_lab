@@ -92,7 +92,10 @@ def get_sample_from_lims(barcode: str):
     sample.quantity = lims_info_custom['样本量']
     sample.project = get_project_or_create(lims_info['ORD_NM'])
 
-    sample.date_sampling = datetime.strptime(lims_info['SPCM_REG_DT'], '%Y-%m-%d')
+    try:
+        sample.date_sampling = datetime.strptime(lims_info['SPCM_REG_DT'], '%Y-%m-%d')
+    except ValueError:
+        sample.date_sampling = datetime.strptime(lims_info['SPCM_REG_DT'], '%Y-%m-%d %H:%M:%S')
     sample.date_receive = datetime.now()
 
     return sample
